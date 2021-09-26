@@ -1,0 +1,21 @@
+.buttonGroup {
+  margin: 8px 0 4px 0;
+  width: 300px;
+  max-width: 100%;
+  text-align: right;
+}
+.button {
+  margin-right: 8px;
+}
+.menu {
+  max-height: 320px;
+  overflow: auto;
+}
+.menuItem:hover {
+  background-color: whitesmoke;
+  color: black !important;
+  user-select: none;
+}
+:global(.selected).menuItem {
+  background-color: whitesmoke;
+}
