@@ -6,10 +6,12 @@ function Canvas({ children, ...props }) {
   return (
     <svg
       xmlns=" http://www.w3.org/2000/svg"
-      {...props}
       className={Styles.svg}
       width={store.canvasWidth}
       height={store.canvasHeight}
+      // TODO: do this
+      onContextMenu={(ev) => ev.preventDefault()}
+      {...props}
     >
       {children}
     </svg>

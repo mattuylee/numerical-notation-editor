@@ -2,6 +2,7 @@ import { action } from "mobx";
 import { message } from "antd";
 import { observer } from "mobx-react-lite";
 import EditableContent from "../../../component/EditableContent";
+import P from "../../../util/placement";
 import store from "../../../store/global";
 import Row from "../../Row";
 import Text from "../../Text";
@@ -22,7 +23,6 @@ const tones = [
   "♭F",
   "♭G",
 ].map((t) => ({ key: t, text: t }));
-const beats = ["4/4"].map((t) => ({ key: t, text: t }));
 const handleChangeTone = action(function (value) {
   store.tone = value;
 });
@@ -53,15 +53,20 @@ function LeftInfoBlock() {
         options={tones}
         onChange={handleChangeTone}
       >
-        <Row type="tone" editable offsetX={store.marginHorizontal} offsetY="64">
+        <Row
+          type="tone"
+          editable
+          offsetX={store.marginHorizontal}
+          offsetY={P.titleOffsetY}
+        >
           <Text>1&nbsp;&nbsp;= </Text>
           {store.tone.startsWith("♭") && (
-            <Text x="25" y="-2" fontSize="12">
+            <Text x="27" y="-2" fontSize="12">
               ♭
             </Text>
           )}
 
-          <Text editable x={store.tone.startsWith("♭") ? 34 : 28}>
+          <Text editable x={store.tone.startsWith("♭") ? 36 : 29}>
             {store.tone.at(-1)}
           </Text>
         </Row>
@@ -76,7 +81,7 @@ function LeftInfoBlock() {
           type="beat"
           editable
           offsetX={store.marginHorizontal + 64}
-          offsetY="64"
+          offsetY={P.titleOffsetY}
         >
           <Text x="0" y="-8" textAnchor="middle">
             {store.beat[0]}
@@ -97,10 +102,10 @@ function LeftInfoBlock() {
           editable
           type="speed"
           offsetX={store.marginHorizontal}
-          offsetY="86"
+          offsetY={P.titleOffsetY + 22}
         >
           <Text x="-4">♩</Text>
-          <Text x="14">=&nbsp;&nbsp;{store.speed}</Text>
+          <Text x="16">=&nbsp;{store.speed}</Text>
         </Row>
       </EditableContent>
     </>

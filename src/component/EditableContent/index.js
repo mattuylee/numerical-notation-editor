@@ -1,18 +1,22 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useImperativeHandle, useState } from "react";
 import { Button, Input, Menu, Select } from "antd";
 import PopoverOnSvg from "../PopoverOnSvg";
 import Styles from "./index.module.css";
 
-function EditableContent({
-  children,
-  title,
-  initialValue,
-  inputType,
-  options,
-  onChange,
-}) {
+const EditableContent = function (
+  { children, title, initialValue, inputType, options, onChange, popoverProps },
+  ref
+) {
   const [inputValue, setInputValue] = useState(initialValue);
   const [popoverVisible, setPopoverVisible] = useState(false);
+  useImperativeHandle(
+    ref,
+    () => ({
+      showPopover: setPopoverVisible.bind(null, true),
+      hidePopover: setPopoverVisible.bind(null, false),
+    }),
+    []
+  );
   const handleVisibilityChange = useCallback(
     function (value) {
       setPopoverVisible(value);
@@ -68,6 +72,7 @@ function EditableContent({
       <Menu className={Styles.menu}>
         {(options || []).map((option) => (
           <Menu.Item
+            icon={option.icon}
             key={option.key}
             className={
               Styles.menuItem + (option.key === initialValue ? " selected" : "")
@@ -100,10 +105,11 @@ function EditableContent({
       visible={popoverVisible}
       placement="bottom"
       onVisibilityChange={handleVisibilityChange}
+      {...popoverProps}
     >
       {children}
     </PopoverOnSvg>
   );
-}
+};
 
-export default EditableContent;
+export default React.forwardRef(EditableContent);

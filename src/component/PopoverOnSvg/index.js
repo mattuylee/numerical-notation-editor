@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Styles from "./index.module.css";
+import { getContainerOffset, getPopoverContainer } from "./container";
 
 // ENHANCE: smart placement
 function PopoverOnSvg({
@@ -20,7 +21,6 @@ function PopoverOnSvg({
   showArrow,
   onVisibilityChange,
 }) {
-  const containerRef = useRef();
   const triggerBoxRef = useRef({
     x: 0,
     y: 0,
@@ -38,6 +38,7 @@ function PopoverOnSvg({
   // true, we'll update it after dom mounted, because we cannot calculate
   // correct position of popover before react mounting it.
   const [innerVisible, setInnerVisible] = useState(false);
+  const [lastContextCord, setLastContextCord] = useState({ x: 0, y: 0 });
   const [, forceUpdate] = useState();
   const popoverClassNames = [Styles.popover, globalClassName].filter(Boolean);
   const arrowClassNames = [Styles.arrow];
@@ -74,8 +75,7 @@ function PopoverOnSvg({
   );
   const handleContextMenu = useCallback(
     (ev) => {
-      // TODO: working
-      console.log(ev.pageX, ev.pageY)
+      setLastContextCord({ x: ev.pageX, y: ev.pageY });
       ev.preventDefault();
       changeVisibility(true);
     },
@@ -128,84 +128,82 @@ function PopoverOnSvg({
       }, 0);
     }
   }
-  if (!containerRef.current) {
-    containerRef.current = document.body.querySelector(
-      "body > div#svg-popover-container"
-    );
-    if (!containerRef.current) {
-      containerRef.current = document.createElement("div");
-      containerRef.current.id = "svg-popover-container";
-      document.body.appendChild(containerRef.current);
+  if (trigger !== "context") {
+    const box = triggerBoxRef.current;
+    switch (true) {
+      case /^(left|right)(top|center|bottom)?$/i.test(placement):
+        mergedStyles.minHeight = "32px";
+        if (placement.startsWith("right")) {
+          mergedStyles.left = box.right + "px";
+        } else {
+          mergedStyles.left = box.left + "px";
+          mergedStyles.transform += " translate(-100%, 0)";
+        }
+        if (placement.endsWith("top")) {
+          mergedStyles.top = box.top + "px";
+          mergedStyles.transform += " translate(0, 0)";
+          arrowStyles.top = "16px";
+        } else if (placement.endsWith("bottom")) {
+          mergedStyles.top = box.bottom + "px";
+          mergedStyles.transform += " translate(0, -100%)";
+          arrowStyles.bottom = "0";
+        } else {
+          mergedStyles.top = box.y + box.height / 2 + "px";
+          mergedStyles.transform += " translate(0, -50%)";
+          arrowStyles.top = "50%";
+        }
+        break;
+      case /^(top|bottom)(left|center|right)?$/i.test(placement):
+      default:
+        if (placement.startsWith("bottom")) {
+          mergedStyles.top = box.bottom + "px";
+        } else {
+          mergedStyles.top = box.y + "px";
+          mergedStyles.transform += " translate(0, -100%)";
+        }
+        if (placement.endsWith("left")) {
+          mergedStyles.left = box.left + "px";
+          arrowStyles.left = "16px";
+        } else if (placement.endsWith("right")) {
+          mergedStyles.left = box.right + "px";
+          mergedStyles.transform += " translate(-100%, 0)";
+          arrowStyles.right = "0";
+        } else {
+          mergedStyles.left = box.right - box.width / 2 + "px";
+          mergedStyles.transform += " translateX(-50%)";
+          arrowStyles.left = "50%";
+        }
+        break;
     }
+    switch (true) {
+      case !showArrow:
+        break;
+      case placement.startsWith("left"):
+        makeOffset(-8);
+        arrowClassNames.push("left");
+        break;
+      case placement.startsWith("right"):
+        makeOffset(8);
+        arrowClassNames.push("right");
+        break;
+      case placement.startsWith("bottom"):
+        makeOffset(0, 8);
+        arrowClassNames.push("bottom");
+        break;
+      case placement.startsWith("top"):
+      default:
+        makeOffset(0, -8);
+        arrowClassNames.push("top");
+        break;
+    }
+    makeOffset(getContainerOffset().x, getContainerOffset().y);
+    mergedStyles.transform += ` translate(${offsetX}px, ${offsetY}px)`;
+  } else {
+    //TODO:
+    mergedStyles.left = lastContextCord.x;
+    mergedStyles.top = lastContextCord.y;
+    mergedStyles.transform = `translate(${offsetX}px, ${offsetY}px)`;
   }
-  const box = triggerBoxRef.current;
-  switch (true) {
-    case /^(left|right)(top|center|bottom)?$/i.test(placement):
-      mergedStyles.minHeight = "32px";
-      if (placement.startsWith("right")) {
-        mergedStyles.left = box.right + "px";
-      } else {
-        mergedStyles.left = box.left + "px";
-        mergedStyles.transform += " translate(-100%, 0)";
-      }
-      if (placement.endsWith("top")) {
-        mergedStyles.top = box.top + "px";
-        mergedStyles.transform += " translate(0, 0)";
-        arrowStyles.top = "16px";
-      } else if (placement.endsWith("bottom")) {
-        mergedStyles.top = box.bottom + "px";
-        mergedStyles.transform += " translate(0, -100%)";
-        arrowStyles.bottom = "0";
-      } else {
-        mergedStyles.top = box.y + box.height / 2 + "px";
-        mergedStyles.transform += " translate(0, -50%)";
-        arrowStyles.top = "50%";
-      }
-      break;
-    case /^(top|bottom)(left|center|right)?$/i.test(placement):
-    default:
-      if (placement.startsWith("bottom")) {
-        mergedStyles.top = box.bottom + "px";
-      } else {
-        mergedStyles.top = box.y + "px";
-        mergedStyles.transform += " translate(0, -100%)";
-      }
-      if (placement.endsWith("left")) {
-        mergedStyles.left = box.left + "px";
-        arrowStyles.left = "16px";
-      } else if (placement.endsWith("right")) {
-        mergedStyles.left = box.right + "px";
-        mergedStyles.transform += " translate(-100%, 0)";
-        arrowStyles.right = "0";
-      } else {
-        mergedStyles.left = box.right - box.width / 2 + "px";
-        mergedStyles.transform += " translateX(-50%)";
-        arrowStyles.left = "50%";
-      }
-      break;
-  }
-  switch (true) {
-    case !showArrow:
-      break;
-    case placement.startsWith("left"):
-      makeOffset(-8);
-      arrowClassNames.push("left");
-      break;
-    case placement.startsWith("right"):
-      makeOffset(8);
-      arrowClassNames.push("right");
-      break;
-    case placement.startsWith("bottom"):
-      makeOffset(0, 8);
-      arrowClassNames.push("bottom");
-      break;
-    case placement.startsWith("top"):
-    default:
-      makeOffset(0, -8);
-      arrowClassNames.push("top");
-      break;
-  }
-  mergedStyles.transform += ` translate(${offsetX}px, ${offsetY}px)`;
   if (darkMode) {
     popoverClassNames.push("dark");
     arrowClassNames.push("dark");
@@ -261,7 +259,7 @@ function PopoverOnSvg({
               </>
             )}
           </div>,
-          containerRef.current
+          getPopoverContainer()
         )}
     </>
   );
@@ -270,6 +268,7 @@ function PopoverOnSvg({
 PopoverOnSvg.defaultProps = {
   trigger: "click",
   placement: "top",
+  showArrow: true,
 };
 
 export default React.memo(PopoverOnSvg);
