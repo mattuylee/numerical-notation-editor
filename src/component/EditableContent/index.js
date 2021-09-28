@@ -1,5 +1,5 @@
 import React, { useCallback, useImperativeHandle, useState } from "react";
-import { Button, Input, Menu, Select } from "antd";
+import { Button, Input, Menu } from "antd";
 import PopoverOnSvg from "../PopoverOnSvg";
 import Styles from "./index.module.css";
 
@@ -84,7 +84,7 @@ const EditableContent = function (
         ))}
       </Menu>
     );
-  }, [inputValue, options]);
+  }, [initialValue, options, handleConfirm]);
   let renderContent, renderPopover;
   switch (inputType) {
     case "select":

@@ -1,15 +1,11 @@
 import SubMenu from "antd/lib/menu/SubMenu";
-import { Button, Dropdown, Menu, Tabs } from "antd";
+import { Button, Dropdown, Menu } from "antd";
 import {
-  DownOutlined,
   EditOutlined,
-  FileOutlined,
   FileTextOutlined,
   FolderOpenOutlined,
   PlusOutlined,
-  ProfileOutlined,
   SaveOutlined,
-  SettingOutlined,
 } from "@ant-design/icons";
 import { observer } from "mobx-react-lite";
 import store from "../../store/global";
@@ -28,7 +24,6 @@ function Editor() {
       const p = store.paragraphs[i];
       heightCache[i] = heightCache[i] || calcParagraphHeight(p);
       height += heightCache[i];
-      console.log(store.paragraphs[i], heightCache[i]);
     }
     return height;
   }
@@ -84,7 +79,18 @@ function Editor() {
         <Header />
         <Row offsetX={store.marginHorizontal} offsetY={P.headerOffsetY}>
           {store.paragraphs.map((p, i) => {
-            return <Paragraph key={p} paragraph={p} offsetY={accumulate(i)} />;
+            let alignJustify = p.alignJustify;
+            if (typeof alignJustify !== "boolean") {
+              alignJustify = !(i === store.paragraphs.length - 1);
+            }
+            return (
+              <Paragraph
+                key={p.key}
+                paragraph={p}
+                offsetY={accumulate(i)}
+                alignJustify={alignJustify}
+              />
+            );
           })}
         </Row>
       </Canvas>

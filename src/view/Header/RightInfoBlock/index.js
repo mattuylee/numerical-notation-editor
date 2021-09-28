@@ -1,10 +1,10 @@
-import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
+import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { Modal } from "antd";
 import { action } from "mobx";
 import { observer } from "mobx-react-lite";
 import EditableContent from "../../../component/EditableContent";
-import store from "../../../store/global";
 import P from "../../../util/placement";
+import store from "../../../store/global";
 import Row from "../../Row";
 import Text from "../../Text";
 
@@ -66,8 +66,8 @@ const handleChangeAuthor = action((index, value) => {
 });
 
 function RightInfoBlock() {
+  // TODO: working
   return (
-    // TODO: working
     <Row
       type="authors"
       offsetX={store.canvasWidth - store.marginHorizontal}
@@ -79,7 +79,6 @@ function RightInfoBlock() {
         popoverProps={{ trigger: "context" }}
         onChange={handleSelectBlockMenu}
       >
-        // TODO: 添加新增指引
         <rect
           x={store.marginHorizontal - 150}
           y="-64"

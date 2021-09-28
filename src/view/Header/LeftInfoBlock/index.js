@@ -61,7 +61,7 @@ function LeftInfoBlock() {
         >
           <Text>1&nbsp;&nbsp;= </Text>
           {store.tone.startsWith("♭") && (
-            <Text x="27" y="-2" fontSize="12">
+            <Text x="27" y="-2" fontSize={store.defaultSubFontSize}>
               ♭
             </Text>
           )}
@@ -89,7 +89,7 @@ function LeftInfoBlock() {
           <Text x="0" y="12" textAnchor="middle">
             {store.beat[1]}
           </Text>
-          <line x1="-8" y1="8" x2="8" y2="8" stroke="black" />
+          <line x1="-8" y1="8" x2="8" y2="8" stroke="currentColor" />
         </Row>
       </EditableContent>
       <EditableContent

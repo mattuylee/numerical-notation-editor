@@ -115,7 +115,7 @@ function PopoverOnSvg({
       document.removeEventListener("mouseup", handler);
       document.removeEventListener("keydown", handler);
     };
-  }, [innerVisible, autoHide, changeVisibility]);
+  }, [innerVisible, autoHide, changeVisibility, trigger]);
 
   if (visible !== undefined && visible !== innerVisible) {
     if (initFlagRef.current) {

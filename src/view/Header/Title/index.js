@@ -29,7 +29,7 @@ function Title() {
           editable
           x="50%"
           fontSize="32"
-          fill="black"
+          fill="currentColor"
           stroke="none"
           textAnchor="middle"
         >
