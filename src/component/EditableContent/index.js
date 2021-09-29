@@ -70,18 +70,21 @@ const EditableContent = function (
   const renderSelectionPopover = useCallback(() => {
     return (
       <Menu className={Styles.menu}>
-        {(options || []).map((option) => (
-          <Menu.Item
-            icon={option.icon}
-            key={option.key}
-            className={
-              Styles.menuItem + (option.key === initialValue ? " selected" : "")
-            }
-            onClick={() => handleConfirm(option.key)}
-          >
-            {option.text}
-          </Menu.Item>
-        ))}
+        {(options || [])
+          .filter((op) => op.visible !== false)
+          .map((option) => (
+            <Menu.Item
+              icon={option.icon}
+              key={option.key}
+              className={
+                Styles.menuItem +
+                (option.key === initialValue ? " selected" : "")
+              }
+              onClick={() => handleConfirm(option.key)}
+            >
+              {option.text}
+            </Menu.Item>
+          ))}
       </Menu>
     );
   }, [initialValue, options, handleConfirm]);
@@ -98,7 +101,7 @@ const EditableContent = function (
 
   return (
     <PopoverOnSvg
-      trigger="click"
+      trigger={inputType === "select" ? "context" : "click"}
       title={title}
       renderContent={renderContent}
       renderPopover={renderPopover}

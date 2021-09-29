@@ -1,12 +1,17 @@
-import { useMemo } from "react";
+import { observer } from "mobx-react-lite";
+import EditableContent from "../../component/EditableContent";
 import P, {
   calcNotationAboveOffset,
   calcNotationPrefixOffset,
   calcNotationWidth,
   calcParagraphAboveOffset,
-  calcParagraphHeight,
+  calcParagraphContentHeight,
   calcParagraphWidth,
 } from "../../util/placement";
+import {
+  getParagraphMenuOptions,
+  handleSelectParagraphMenu,
+} from "../../menu/paragraph";
 import Notation from "../Notation";
 import Row from "../Row";
 
@@ -34,6 +39,7 @@ function Paragraph({ paragraph, offsetY, alignJustify }) {
     return width;
   };
 
+  // 缓存音符偏移量
   const noteOffsets = notations.map((_, i) => {
     return (
       // 渲染音符时坐标为其中心，故偏移半个音符宽
@@ -116,10 +122,11 @@ function Paragraph({ paragraph, offsetY, alignJustify }) {
       0.0062948773732605465 * x * x +
       0.6378785891964498 * x -
       0.6843414475200537;
-    y = Math.max(Math.min(y, P.maxTieHeight), P.minTieHeight);
+    y = Math.max(Math.min(y, P.maxTieBezierOffset), P.minTieHeight);
     const bezierY = offsetY - y;
     return (
       <path
+        key={`${fromIndex}_${toIndex}_${offsetY}`}
         d={`M${bezierX1} ${offsetY} C${bezierX2} ${bezierY} ${bezierX3} ${bezierY} ${bezierX4} ${offsetY}`}
         stroke="currentColor"
         fill="none"
@@ -154,15 +161,40 @@ function Paragraph({ paragraph, offsetY, alignJustify }) {
     return ties;
   };
 
+  const renderParagraphMask = () => {
+    const height = calcParagraphContentHeight(paragraph);
+    return (
+      <EditableContent
+        inputType="select"
+        options={getParagraphMenuOptions(paragraph)}
+        onChange={handleSelectParagraphMenu}
+      >
+        <rect
+          x={-P.xWidth / 2}
+          y={-calcParagraphAboveOffset(paragraph)}
+          width={P.maxContentWidth}
+          height={height}
+          fill="transparent"
+        ></rect>
+      </EditableContent>
+    );
+  };
+
   return (
     <Row type="paragraph" offsetY={offsetY}>
+      {renderParagraphMask()}
       {renderTies()}
       {paragraph.notations.map((n, i) => (
-        <Notation key={n.key} notation={n} offsetX={noteOffsets[i]} />
+        <Notation
+          key={n.key}
+          notation={n}
+          paragraph={paragraph}
+          offsetX={noteOffsets[i]}
+        />
       ))}
       {renderUnderlines()}
     </Row>
   );
 }
 
-export default Paragraph;
+export default observer(Paragraph);

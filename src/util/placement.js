@@ -73,6 +73,9 @@ const placement = observable({
     return 8;
   },
   get maxTieHeight() {
+    return 20;
+  },
+  get maxTieBezierOffset() {
     return 25;
   },
   get underlineStepOffsetY() {
@@ -136,9 +139,16 @@ const placement = observable({
 const calcTextWidth = _calcTextWidth.bind(null, store.defaultFontSize);
 const calcSubTextWidth = _calcTextWidth.bind(null, store.defaultSubFontSize);
 
-// 计算段落行高
+// 计算段落占的空间高
 function calcParagraphHeight(paragraph) {
+  return calcParagraphContentHeight(paragraph) + store.gapBetweenParagraph;
+}
+// 计算段落内容的高度
+function calcParagraphContentHeight(paragraph) {
   const notations = paragraph.notations || [];
+  if (notations.length === 0) {
+    return placement.xHeight;
+  }
   let tieHeight = 0;
   if (_hasTie(paragraph)) {
     tieHeight = placement.maxTieHeight;
@@ -150,7 +160,7 @@ function calcParagraphHeight(paragraph) {
   const belowOffsetMap = noteHeightMap.map((v, i) => v - aboveOffsetMap[i]);
   const maxNoteOffset =
     Math.max(...belowOffsetMap) + Math.max(...aboveOffsetMap);
-  return tieHeight + maxNoteOffset + store.gapBetweenParagraph;
+  return tieHeight + maxNoteOffset;
 }
 
 // 计算一行中所有音符的宽度和
@@ -169,6 +179,9 @@ function calcParagraphWidth(paragraph) {
 // 计算段落中的音符中心以上偏移量的最大值
 function calcParagraphAboveOffset(paragraph) {
   const notations = paragraph.notations || [];
+  if (notations.length === 0) {
+    return placement.xHeight / 2;
+  }
   let tieHeight = 0;
   if (_hasTie(paragraph)) {
     tieHeight = placement.maxTieHeight;
@@ -270,6 +283,7 @@ export {
   calcNotationAboveOffset,
   calcParagraphWidth,
   calcParagraphHeight,
+  calcParagraphContentHeight,
   calcParagraphAboveOffset,
   calcTextWidth,
   calcSubTextWidth,

@@ -16,7 +16,7 @@ export default function Text({ children, editable, ...props }) {
         dominantBaseline="hanging"
         stroke="none"
         fontWeight="bold"
-        fill="black"
+        fill="currentColor"
         dangerouslySetInnerHTML={{ __html: escapeHtml(children) }}
         {...props}
       ></text>
@@ -36,7 +36,7 @@ export default function Text({ children, editable, ...props }) {
       dominantBaseline="hanging"
       stroke="none"
       fontWeight="bold"
-      fill="black"
+      fill="currentColor"
       {...props}
     >
       {children}

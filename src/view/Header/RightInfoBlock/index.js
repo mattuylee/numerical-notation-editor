@@ -66,7 +66,6 @@ const handleChangeAuthor = wrappedAction((index, value) => {
 });
 
 function RightInfoBlock() {
-  // TODO: working
   return (
     <Row
       type="authors"

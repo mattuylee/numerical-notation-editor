@@ -2,22 +2,29 @@ import { Button, Dropdown } from "antd";
 import {
   EditOutlined,
   FileTextOutlined,
+  RetweetOutlined,
   SettingOutlined,
   SyncOutlined,
 } from "@ant-design/icons";
 import { observer } from "mobx-react-lite";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import store from "../../store/global";
 import P, {
   calcParagraphAboveOffset,
   calcParagraphHeight,
 } from "../../util/placement";
+import {
+  convertMenu,
+  editMenu,
+  fileMenu,
+  handleClick,
+  handleKeyPress,
+} from "../../menu/editor";
 import Canvas from "../Canvas";
 import ConfigModal from "../ConfigModal";
 import Header from "../Header";
 import Paragraph from "../Paragraph";
 import Row from "../Row";
-import { convertMenu, editMenu, fileMenu } from "../menu/editor";
 import Styles from "./index.module.css";
 
 function Editor() {
@@ -35,6 +42,15 @@ function Editor() {
     height += calcParagraphAboveOffset(paragraphs[index]);
     return height;
   }
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyPress);
+    document.addEventListener("click", handleClick);
+    return () => {
+      document.removeEventListener("keydown", handleKeyPress);
+      document.removeEventListener("click", handleClick);
+    };
+  }, []);
 
   return (
     <div
@@ -57,7 +73,7 @@ function Editor() {
             </Button>
           </Dropdown>
           <Dropdown overlay={convertMenu} placement="bottomLeft">
-            <Button icon={<SyncOutlined />} type="text">
+            <Button icon={<RetweetOutlined />} type="text">
               转调
             </Button>
           </Dropdown>

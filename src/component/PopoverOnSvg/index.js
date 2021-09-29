@@ -17,7 +17,6 @@ function PopoverOnSvg({
   trigger,
   visible,
   autoHide,
-  // TODO: complete this
   showArrow,
   onVisibilityChange,
 }) {
@@ -199,7 +198,6 @@ function PopoverOnSvg({
     makeOffset(getContainerOffset().x, getContainerOffset().y);
     mergedStyles.transform += ` translate(${offsetX}px, ${offsetY}px)`;
   } else {
-    //TODO:
     mergedStyles.left = lastContextCord.x;
     mergedStyles.top = lastContextCord.y;
     mergedStyles.transform = `translate(${offsetX}px, ${offsetY}px)`;
@@ -242,10 +240,12 @@ function PopoverOnSvg({
               )
             ) : (
               <>
-                <div
-                  className={arrowClassNames.join(" ")}
-                  style={arrowStyles}
-                ></div>
+                {showArrow && (
+                  <div
+                    className={arrowClassNames.join(" ")}
+                    style={arrowStyles}
+                  ></div>
+                )}
                 {title && (
                   <header className={headerClassNames.join(" ")}>
                     {title}

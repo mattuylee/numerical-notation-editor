@@ -1,12 +1,23 @@
+import { action } from "mobx";
+import { message } from "antd";
 import { observer } from "mobx-react-lite";
+import EditableContent from "../../component/EditableContent";
+import state from "../../store/state";
 import store from "../../store/global";
 import P, {
   calcNotationPrefixOffset,
   calcSubTextWidth,
 } from "../../util/placement";
-import { Notes } from "../../util/note";
+import { findParagraphAndNotation } from "../../util/editor";
+import {
+  getNotationContextItems,
+  handleNotationContext,
+} from "../../menu/notation";
+import { notations } from "../../util/notation";
+import { wrappedAction } from "../../store/history";
 import Row from "../Row";
 import Text from "../Text";
+import Styles from "./index.module.css";
 
 function composeArray(octave) {
   const len = Math.abs(Number(octave));
@@ -16,7 +27,35 @@ function composeArray(octave) {
   return Array(len).fill(0, 0, len);
 }
 
-function Notation({ offsetX, notation }) {
+function Notation({ offsetX, notation, paragraph }) {
+  const handleClick = wrappedAction(() => {
+    state.selectedNotationKey = notation.key;
+    state.shouldNotationBlurAfterClick = false;
+    if (state.tieSourceKey) {
+      // 处理连音线
+      if (state.tieSourceKey === notation.key) {
+        state.tieSourceKey = null;
+        // NOTICE: 如果要添加其他逻辑注意这里的return
+        return;
+      }
+      const {
+        notation: sourceNotation,
+        paragraph: sourceParagraph,
+      } = findParagraphAndNotation(state.tieSourceKey);
+      if (!sourceNotation) {
+        state.tieSourceKey = null;
+        return;
+      }
+      if (sourceParagraph.notations.includes(notation)) {
+        sourceNotation.tieTo = notation.key;
+        notation.tieTo = sourceNotation.key;
+      } else {
+        message.warn("只允许相同段落的音符相连！");
+      }
+      state.tieSourceKey = null;
+    }
+  });
+
   const underlineOffset = P.underlineStepOffsetY * (notation.underline | 0);
   const octaveInitialOffset =
     notation.octave > 0
@@ -65,7 +104,7 @@ function Notation({ offsetX, notation }) {
 
   const renderNote = () => {
     let transform;
-    if (notation.note === Notes.extend) {
+    if (notation.note === notations.extend) {
       // 延音符太长了缩短一点
       transform = "scale(0.8, 1)";
     }
@@ -83,21 +122,46 @@ function Notation({ offsetX, notation }) {
         type="octave"
         cx="0"
         cy={octaveInitialOffset + octaveStepOffset * i}
+        fill="currentColor"
         r="2"
       ></circle>
     ));
   };
 
+  const options = getNotationContextItems(notation, paragraph);
   return (
-    <Row type="notation" offsetX={offsetX}>
-      {renderPrefixSups()}
-      {renderTopDecorators()}
-      {renderNote()}
-      {notation.dotted && (
-        <circle type="dot" cx={P.xWidth + 4} cy="-2" r="2"></circle>
-      )}
-      {renderOctave()}
-    </Row>
+    <EditableContent
+      inputType="select"
+      options={options}
+      popoverProps={{ trigger: "context" }}
+      onChange={handleNotationContext.bind(null, options)}
+    >
+      <Row
+        editable
+        type="notation"
+        offsetX={offsetX}
+        onClick={handleClick}
+        className={
+          state.selectedNotationKey === notation.key
+            ? Styles.selectedNotation
+            : ""
+        }
+      >
+        {renderPrefixSups()}
+        {renderTopDecorators()}
+        {renderNote()}
+        {notation.dotted && (
+          <circle
+            type="dot"
+            cx={P.xWidth + 4}
+            cy="-2"
+            r="2"
+            fill="currentColor"
+          ></circle>
+        )}
+        {renderOctave()}
+      </Row>
+    </EditableContent>
   );
 }
 

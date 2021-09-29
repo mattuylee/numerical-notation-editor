@@ -1,7 +1,10 @@
 import React from "react";
 import { observable } from "mobx";
+import { createNotation } from "../util/notation";
 
+// 全局数据及配置，需要持久化
 let globalStore = observable({
+  version: 1,
   canvasWidth: 1024,
   canvasHeight: 1448,
   defaultFontSize: 16,
@@ -12,7 +15,7 @@ let globalStore = observable({
   marginTop: 32,
   gapAfterTitle: 16,
   gapAfterHeader: 32,
-  gapBetweenParagraph: 0,
+  gapBetweenParagraph: 32,
   gapBetweenNotation: 8,
   beat: [4, 4],
   speed: 75,
@@ -92,7 +95,7 @@ let globalStore = observable({
           underline: 0,
           dotted: false,
         },
-      ].map((obj) => ((obj.key = obj.key || Math.random()), obj)),
+      ].map((obj) => createNotation(obj)),
     },
     {
       notations: [
@@ -113,7 +116,7 @@ let globalStore = observable({
           octave: 0,
           dotted: false,
         },
-      ].map((obj) => ((obj.key = obj.key || Math.random()), obj)),
+      ].map((obj) => createNotation(obj)),
       alignJustify: false,
     },
     {
@@ -140,13 +143,12 @@ let globalStore = observable({
           octave: 0,
           dotted: false,
         },
-      ].map((obj) => ((obj.key = Math.random()), obj)),
+      ].map((obj) => createNotation(obj)),
     },
   ].map((obj) => ((obj.key = Math.random()), obj)),
 });
 
 const GlobalContext = React.createContext(globalStore);
-
 
 export default globalStore;
 export { GlobalContext };
