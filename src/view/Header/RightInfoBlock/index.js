@@ -5,6 +5,7 @@ import { observer } from "mobx-react-lite";
 import EditableContent from "../../../component/EditableContent";
 import P from "../../../util/placement";
 import store from "../../../store/global";
+import { wrappedAction } from "../../../store/history";
 import Row from "../../Row";
 import Text from "../../Text";
 
@@ -32,20 +33,19 @@ const blockContextMenu = [
     text: "添加作者信息",
     icon: <PlusOutlined style={{ color: "grey" }} />,
     onClick: () => {
-      store.authors.push("【作曲者】  作曲");
       store.authors.push("【记谱者】  记谱");
     },
   },
 ];
-const handleSelectMenu = action((index, value) => {
+const handleSelectMenu = wrappedAction((index, value) => {
   const menu = authorContextMenu.find((m) => m.key === value);
   menu?.onClick(index);
 });
-const handleSelectBlockMenu = action((value) => {
+const handleSelectBlockMenu = wrappedAction((value) => {
   const menu = blockContextMenu.find((m) => m.key === value);
   menu?.onClick();
 });
-const handleChangeAuthor = action((index, value) => {
+const handleChangeAuthor = wrappedAction((index, value) => {
   if (!value) {
     return new Promise((resolve) => {
       Modal.confirm({

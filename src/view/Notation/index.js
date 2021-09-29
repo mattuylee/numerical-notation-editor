@@ -17,10 +17,10 @@ function composeArray(octave) {
 }
 
 function Notation({ offsetX, notation }) {
-  const underlineOffset = P.underlineOffsetY * (notation.underline | 0);
+  const underlineOffset = P.underlineStepOffsetY * (notation.underline | 0);
   const octaveInitialOffset =
     notation.octave > 0
-      ? P.octaveInitialOffsetAbove
+      ? -P.octaveInitialOffsetAbove
       : P.octaveInitialOffsetBelow + underlineOffset;
   const octaveStepOffset = (notation.octave > 0 ? -1 : 1) * P.octaveStepOffsetY;
   let topDecoratorOffset = 0;
@@ -82,7 +82,7 @@ function Notation({ offsetX, notation }) {
         key={i}
         type="octave"
         cx="0"
-        cy={octaveStepOffset * i + octaveInitialOffset}
+        cy={octaveInitialOffset + octaveStepOffset * i}
         r="2"
       ></circle>
     ));

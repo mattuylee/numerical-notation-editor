@@ -1,57 +1,40 @@
-import SubMenu from "antd/lib/menu/SubMenu";
-import { Button, Dropdown, Menu } from "antd";
+import { Button, Dropdown } from "antd";
 import {
   EditOutlined,
   FileTextOutlined,
-  FolderOpenOutlined,
-  PlusOutlined,
-  SaveOutlined,
+  SettingOutlined,
+  SyncOutlined,
 } from "@ant-design/icons";
 import { observer } from "mobx-react-lite";
+import { useState } from "react";
 import store from "../../store/global";
-import P, { calcParagraphHeight } from "../../util/placement";
+import P, {
+  calcParagraphAboveOffset,
+  calcParagraphHeight,
+} from "../../util/placement";
 import Canvas from "../Canvas";
+import ConfigModal from "../ConfigModal";
 import Header from "../Header";
 import Paragraph from "../Paragraph";
 import Row from "../Row";
+import { convertMenu, editMenu, fileMenu } from "../menu/editor";
 import Styles from "./index.module.css";
 
 function Editor() {
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const heightCache = [];
   function accumulate(index) {
+    const paragraphs = store.paragraphs || [];
     let height = 0;
     for (let i = 0; i < index; i++) {
-      const p = store.paragraphs[i];
+      const p = paragraphs[i];
       heightCache[i] = heightCache[i] || calcParagraphHeight(p);
       height += heightCache[i];
     }
+    // 段落渲染定位基于段落中心，因此加上上半部分的偏移量
+    height += calcParagraphAboveOffset(paragraphs[index]);
     return height;
   }
-
-  const fileMenu = (
-    <Menu>
-      <Menu.Item key="create" icon={<PlusOutlined />}>
-        新建
-      </Menu.Item>
-      <Menu.Item key="open" icon={<FolderOpenOutlined />}>
-        打开
-      </Menu.Item>
-      <Menu.Item key="save" icon={<SaveOutlined />}>
-        保存
-      </Menu.Item>
-    </Menu>
-  );
-  const editMenu = (
-    <Menu>
-      <Menu.Item key="title">编辑曲名</Menu.Item>
-      <SubMenu key="tone" title="转调">
-        <Menu.Item key="setting:1">Option 1</Menu.Item>
-        <Menu.Item key="setting:2">Option 2</Menu.Item>
-        <Menu.Item key="setting:3">Option 3</Menu.Item>
-        <Menu.Item key="setting:4">Option 4</Menu.Item>
-      </SubMenu>
-    </Menu>
-  );
 
   return (
     <div
@@ -73,6 +56,14 @@ function Editor() {
               编辑
             </Button>
           </Dropdown>
+          <Dropdown overlay={convertMenu} placement="bottomLeft">
+            <Button icon={<SyncOutlined />} type="text">
+              转调
+            </Button>
+          </Dropdown>
+          <Button icon={<SettingOutlined />} type="text">
+            配置
+          </Button>
         </div>
       </div>
       <Canvas>
@@ -94,6 +85,10 @@ function Editor() {
           })}
         </Row>
       </Canvas>
+      <ConfigModal
+        visible={isModalVisible}
+        onVisibleChange={setIsModalVisible}
+      ></ConfigModal>
     </div>
   );
 }

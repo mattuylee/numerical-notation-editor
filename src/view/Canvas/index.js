@@ -2,6 +2,8 @@ import { observer } from "mobx-react-lite";
 import store from "../../store/global";
 import Styles from "./index.module.css";
 
+// ENHANCE: 增加整体缩放能力
+
 function Canvas({ children, ...props }) {
   return (
     <svg

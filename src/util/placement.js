@@ -1,6 +1,8 @@
 import { observable } from "mobx";
 import store from "../store/global";
 
+// ENHANCE: 通过mobx的computed机制缓存一些计算值
+
 let canvas, context2D, defaultFontFamily;
 let measureSvgEl, measureTextEl;
 
@@ -55,18 +57,35 @@ function _calcTextBox(fontSize, text) {
   return measureTextEl.getBBox();
 }
 
+// 判断段落中的音符是否有连音线
+function _hasTie(paragraph) {
+  const notations = paragraph?.notations || [];
+  return notations.some(
+    (n, i) => n.tieTo && notations.findIndex((nn) => nn.key === n.tieTo) > i
+  );
+}
+
 const placement = observable({
   get maxContentWidth() {
     return Math.max(store.canvasWidth - store.marginHorizontal * 2, 0);
   },
-  get underlineOffsetY() {
+  get minTieHeight() {
+    return 8;
+  },
+  get maxTieHeight() {
+    return 25;
+  },
+  get underlineStepOffsetY() {
     return 3;
+  },
+  get underlineInitialOffsetY() {
+    return this.xHeight / 2 - 3;
   },
   get octaveStepOffsetY() {
     return 5;
   },
   get octaveInitialOffsetAbove() {
-    return -(placement.xHeight / 2 + 2);
+    return placement.xHeight / 2 + 2;
   },
   get octaveInitialOffsetBelow() {
     return placement.xHeight / 2 - 2;
@@ -119,13 +138,22 @@ const calcSubTextWidth = _calcTextWidth.bind(null, store.defaultSubFontSize);
 
 // 计算段落行高
 function calcParagraphHeight(paragraph) {
-  // TODO: 连音符高度
-  const maxNoteHeight = Math.max(
-    ...paragraph.notations.map((n) => calcNotationHeight(n))
-  );
-  return maxNoteHeight + store.gapBetweenParagraph;
+  const notations = paragraph.notations || [];
+  let tieHeight = 0;
+  if (_hasTie(paragraph)) {
+    tieHeight = placement.maxTieHeight;
+  }
+  // 段落高度不是最高的音符的高度，而是上边偏移最大的音符的上部分偏移量+下边偏移最
+  // 大的音符的下部分偏移量
+  const noteHeightMap = notations.map((n) => calcNotationHeight(n));
+  const aboveOffsetMap = notations.map((n) => calcNotationAboveOffset(n));
+  const belowOffsetMap = noteHeightMap.map((v, i) => v - aboveOffsetMap[i]);
+  const maxNoteOffset =
+    Math.max(...belowOffsetMap) + Math.max(...aboveOffsetMap);
+  return tieHeight + maxNoteOffset + store.gapBetweenParagraph;
 }
 
+// 计算一行中所有音符的宽度和
 function calcParagraphWidth(paragraph) {
   const notations = paragraph.notations || [];
   if (notations.length === 0) {
@@ -136,6 +164,19 @@ function calcParagraphWidth(paragraph) {
       .map((n) => calcNotationWidth(n))
       .reduce((prev, curr) => prev + curr, 0) - store.gapBetweenNotation
   );
+}
+
+// 计算段落中的音符中心以上偏移量的最大值
+function calcParagraphAboveOffset(paragraph) {
+  const notations = paragraph.notations || [];
+  let tieHeight = 0;
+  if (_hasTie(paragraph)) {
+    tieHeight = placement.maxTieHeight;
+  }
+  const notationOffset = notations
+    .map((n) => calcNotationAboveOffset(n))
+    .reduce((prev, curr) => Math.max(prev, curr), placement.xHeight / 2);
+  return notationOffset + tieHeight;
 }
 
 // 计算音符中心位置左边的宽度
@@ -151,10 +192,9 @@ function calcNotationAboveOffset(notation) {
   offsets.push(noteOffsetTop);
   let octaveOffset = 0;
   if (notation.octave > 0) {
-    octaveOffset = Math.abs(
-      placement.octaveInitialOffsetAbove -
-        placement.octaveStepOffsetY * notation.octave
-    );
+    octaveOffset =
+      placement.octaveInitialOffsetAbove +
+      placement.octaveStepOffsetY * Math.abs(notation.octave);
   }
   offsets.push(octaveOffset);
   const topDecoratorOffset =
@@ -184,10 +224,20 @@ function calcNotationHeight(notation) {
     supOffsetY;
   offsets.push(noteOffsetTop, noteOffsetBottom);
   const oc = notation.octave | 0;
+  const underlineOffsetY =
+    notation.underline > 0
+      ? placement.underlineInitialOffsetY +
+        placement.underlineStepOffsetY * (notation.underline | 0)
+      : 0;
+  offsets.push(underlineOffsetY);
+  const octaveInitialOffsetY =
+    notation.octave > 0
+      ? -placement.octaveInitialOffsetAbove
+      : placement.octaveInitialOffsetBelow + underlineOffsetY;
   if (oc > 0) {
-    octaveOffsetY = placement.octaveInitialOffsetAbove + 5 * oc;
+    octaveOffsetY = octaveInitialOffsetY - 5 * Math.abs(oc);
   } else if (oc < 0) {
-    octaveOffsetY = placement.octaveInitialOffsetBelow + 5 * oc;
+    octaveOffsetY = octaveInitialOffsetY + 5 * Math.abs(oc);
   } else {
     octaveOffsetY = 0;
   }
@@ -196,6 +246,18 @@ function calcNotationHeight(notation) {
   // 加上基准以上的半个字符的高度，得到前置上标的最大纵向偏移
   supOffsetY = notation.prefixSups?.length ? placement.subXHeight - 4 : 0;
   offsets.push(supOffsetY);
+  // 顶部装饰符在高八度点之上
+  let octaveOffsetYAbove = 0;
+  if (notation.octave > 0) {
+    octaveOffsetYAbove =
+      placement.octaveInitialOffsetAbove -
+      placement.octaveStepOffsetY * notation.octave;
+  }
+  const topDecoratorOffset =
+    octaveOffsetYAbove -
+    placement.subXHeight * (notation.topDecorators?.length | 0) -
+    2;
+  offsets.push(topDecoratorOffset);
   const maxOffsetY = Math.max(...offsets);
   const minOffsetY = Math.min(...offsets);
   return maxOffsetY - minOffsetY;
@@ -208,6 +270,7 @@ export {
   calcNotationAboveOffset,
   calcParagraphWidth,
   calcParagraphHeight,
+  calcParagraphAboveOffset,
   calcTextWidth,
   calcSubTextWidth,
 };

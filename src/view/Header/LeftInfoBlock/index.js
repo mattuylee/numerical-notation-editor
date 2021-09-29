@@ -4,32 +4,33 @@ import { observer } from "mobx-react-lite";
 import EditableContent from "../../../component/EditableContent";
 import P from "../../../util/placement";
 import store from "../../../store/global";
+import { wrappedAction } from "../../../store/history";
 import Row from "../../Row";
 import Text from "../../Text";
 
 const tones = [
-  "A",
-  "B",
   "C",
   "D",
   "E",
   "F",
   "G",
-  "♭A",
-  "♭B",
+  "A",
+  "B",
   "♭C",
   "♭D",
   "♭E",
   "♭F",
   "♭G",
+  "♭A",
+  "♭B",
 ].map((t) => ({ key: t, text: t }));
-const handleChangeTone = action(function (value) {
+const handleChangeTone = wrappedAction(function (value) {
   store.tone = value;
 });
-const handleChangeSpeed = action(function (value) {
+const handleChangeSpeed = wrappedAction(function (value) {
   store.speed = value;
 });
-const handleChangeBeat = action(function (value) {
+const handleChangeBeat = wrappedAction(function (value) {
   const beat = String(value).split("/");
   if (beat.length !== 2) {
     message.error("请以【*/*】的格式输入节拍！");

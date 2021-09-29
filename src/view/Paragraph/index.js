@@ -3,6 +3,7 @@ import P, {
   calcNotationAboveOffset,
   calcNotationPrefixOffset,
   calcNotationWidth,
+  calcParagraphAboveOffset,
   calcParagraphHeight,
   calcParagraphWidth,
 } from "../../util/placement";
@@ -13,9 +14,6 @@ function Paragraph({ paragraph, offsetY, alignJustify }) {
   console.log("render paragraph");
   const notations = paragraph.notations || [];
   const widthCache = [];
-  const paraOffsetY = Math.max(
-    ...paragraph.notations.map((n) => calcNotationAboveOffset(n))
-  );
   let itemFlexOffset = 0;
   if (alignJustify && paragraph.notations?.length > 1) {
     const realWidth = calcParagraphWidth(paragraph);
@@ -31,7 +29,9 @@ function Paragraph({ paragraph, offsetY, alignJustify }) {
       widthCache[i] = widthCache[i] || calcNotationWidth(n);
       width += widthCache[i];
     }
-    return width + calcNotationPrefixOffset(notations[index]);
+    // 音符的定位基准是其中心，因此要加上当前音符的前缀部分偏移
+    width += calcNotationPrefixOffset(notations[index]);
+    return width;
   };
 
   const noteOffsets = notations.map((_, i) => {
@@ -62,7 +62,7 @@ function Paragraph({ paragraph, offsetY, alignJustify }) {
     const lines = [];
     // 记录音符当前需要绘制的增减时线的条数
     let helpMap = notations.map((n) => (n.underline > 0 ? n.underline : 0));
-    let baseOffsetY = P.xHeight / 2 - P.underlineOffsetY;
+    let baseOffsetY = P.underlineInitialOffsetY;
     while (helpMap.some((n) => n > 0)) {
       let fromIndex = -1;
       let toIndex = fromIndex;
@@ -98,19 +98,26 @@ function Paragraph({ paragraph, offsetY, alignJustify }) {
           }
         }
       }
-      baseOffsetY += P.underlineOffsetY;
+      baseOffsetY += P.underlineStepOffsetY;
     }
     return lines;
   };
 
   // 渲染连音线
   const renderTie = (offsetY, fromIndex, toIndex) => {
-    const bezierX1 = 0; //noteOffsets[fromIndex];
+    const bezierX1 = noteOffsets[fromIndex];
     const bezierX2 = bezierX1 + 4;
-    const bezierX4 = 32// noteOffsets[toIndex];
+    const bezierX4 = noteOffsets[toIndex];
     const bezierX3 = bezierX4 - 4;
-    const bezierY = offsetY - 12;
-    console.log(bezierX4 - bezierX1, bezierY - offsetY);
+    const x = bezierX4 - bezierX1;
+    // ENHANCE: 优化贝赛尔曲线
+    let y =
+      0.000021917145491103032 * x * x * x -
+      0.0062948773732605465 * x * x +
+      0.6378785891964498 * x -
+      0.6843414475200537;
+    y = Math.max(Math.min(y, P.maxTieHeight), P.minTieHeight);
+    const bezierY = offsetY - y;
     return (
       <path
         d={`M${bezierX1} ${offsetY} C${bezierX2} ${bezierY} ${bezierX3} ${bezierY} ${bezierX4} ${offsetY}`}
@@ -148,7 +155,7 @@ function Paragraph({ paragraph, offsetY, alignJustify }) {
   };
 
   return (
-    <Row type="paragraph" offsetY={offsetY + paraOffsetY}>
+    <Row type="paragraph" offsetY={offsetY}>
       {renderTies()}
       {paragraph.notations.map((n, i) => (
         <Notation key={n.key} notation={n} offsetX={noteOffsets[i]} />

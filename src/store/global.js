@@ -12,7 +12,7 @@ let globalStore = observable({
   marginTop: 32,
   gapAfterTitle: 16,
   gapAfterHeader: 32,
-  gapBetweenParagraph: 32,
+  gapBetweenParagraph: 0,
   gapBetweenNotation: 8,
   beat: [4, 4],
   speed: 75,
@@ -24,13 +24,13 @@ let globalStore = observable({
         {
           note: "6",
           octave: -2,
-          underline: 1,
+          underline: 2,
           dotted: true,
         },
         {
           note: "6",
           octave: -1,
-          underline: 0,
+          underline: 1,
           dotted: false,
         },
         {
@@ -45,7 +45,7 @@ let globalStore = observable({
           underline: 0,
           dotted: false,
           key: "hk",
-          tieTo: "ml",
+          // tieTo: "ml",
         },
         {
           note: "│",
@@ -55,7 +55,7 @@ let globalStore = observable({
         },
         {
           key: "ml",
-          tieTo: "hk",
+          // tieTo: "hk",
           note: "1",
           octave: 0,
           underline: 0,
@@ -63,14 +63,14 @@ let globalStore = observable({
         },
         {
           note: "2",
-          octave: -1,
-          underline: 2,
+          // octave: -1,
+          // underline: 2,
           dotted: false,
         },
         {
           note: "2",
           octave: 2,
-          underline: 1,
+          // underline: 1,
           breakUnderline: true,
           dotted: false,
         },
@@ -98,15 +98,15 @@ let globalStore = observable({
       notations: [
         {
           note: "0",
-          octave: 2,
+          octave: 0,
           dotted: false,
         },
         {
           note: "4",
-          octave: 1,
+          octave: 0,
           dotted: false,
-          prefixSups: ["♯"],
-          topDecorators: ["※"],
+          // prefixSups: ["♯"],
+          // topDecorators: ["※", "※", "※"],
         },
         {
           note: "2",
@@ -143,9 +143,10 @@ let globalStore = observable({
       ].map((obj) => ((obj.key = Math.random()), obj)),
     },
   ].map((obj) => ((obj.key = Math.random()), obj)),
-  // TODO: do this
-  popoverRefs: {},
 });
 
+const GlobalContext = React.createContext(globalStore);
+
+
 export default globalStore;
-export const GlobalContext = React.createContext(globalStore);
+export { GlobalContext };
