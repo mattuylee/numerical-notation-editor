@@ -88,5 +88,14 @@ function runInWrappedAction(func) {
     executeAction.call(this, func);
   });
 }
+// 不需要记录历史记录的时候直接使用原action
+const unwrappedAction = action;
+const runInUnwrappedAction = runInAction;
 
-export { go, wrappedAction, runInWrappedAction };
+export {
+  go,
+  wrappedAction,
+  runInWrappedAction,
+  unwrappedAction,
+  runInUnwrappedAction,
+};

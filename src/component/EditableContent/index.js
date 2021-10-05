@@ -4,7 +4,18 @@ import PopoverOnSvg from "../PopoverOnSvg";
 import Styles from "./index.module.css";
 
 const EditableContent = function (
-  { children, title, initialValue, inputType, options, onChange, popoverProps },
+  {
+    children,
+    title,
+    initialValue,
+    inputType,
+    // ENHANCE: 去除这个prop，使用overlay代替
+    options,
+    // 选择模式要渲染的菜单，如果没有提供则根据options生成
+    overlay,
+    onChange,
+    popoverProps,
+  },
   ref
 ) {
   const [inputValue, setInputValue] = useState(initialValue);
@@ -37,6 +48,9 @@ const EditableContent = function (
     },
     [inputValue, onChange]
   );
+  const handleHideContextMenu = useCallback(() => {
+    setPopoverVisible(false);
+  }, []);
   const handleCancel = useCallback(
     function () {
       setInputValue(initialValue);
@@ -68,6 +82,9 @@ const EditableContent = function (
     [inputValue, handleInput, handleConfirm, handleCancel]
   );
   const renderSelectionPopover = useCallback(() => {
+    if (overlay) {
+      return <div onClick={handleHideContextMenu}>{overlay}</div>;
+    }
     return (
       <Menu className={Styles.menu}>
         {(options || [])

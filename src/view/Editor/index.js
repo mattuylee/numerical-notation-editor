@@ -2,12 +2,12 @@ import { Button, Dropdown } from "antd";
 import {
   EditOutlined,
   FileTextOutlined,
+  QuestionOutlined,
   RetweetOutlined,
   SettingOutlined,
-  SyncOutlined,
 } from "@ant-design/icons";
 import { observer } from "mobx-react-lite";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import store from "../../store/global";
 import P, {
   calcParagraphAboveOffset,
@@ -28,7 +28,8 @@ import Row from "../Row";
 import Styles from "./index.module.css";
 
 function Editor() {
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isConfigModalVisible, setIsConfigModalVisible] = useState(false);
+  const [isHelpModalVisible, setIsHelpModalVisible] = useState(false);
   const heightCache = [];
   function accumulate(index) {
     const paragraphs = store.paragraphs || [];
@@ -42,6 +43,12 @@ function Editor() {
     height += calcParagraphAboveOffset(paragraphs[index]);
     return height;
   }
+  const handleShowConfigDialog = useCallback(() => {
+    setIsConfigModalVisible(true);
+  }, []);
+  const handleShowHelpDialog = useCallback(() => {
+    setIsHelpModalVisible(true);
+  }, []);
 
   useEffect(() => {
     document.addEventListener("keydown", handleKeyPress);
@@ -77,8 +84,19 @@ function Editor() {
               转调
             </Button>
           </Dropdown>
-          <Button icon={<SettingOutlined />} type="text">
+          <Button
+            icon={<SettingOutlined />}
+            type="text"
+            onClick={handleShowConfigDialog}
+          >
             配置
+          </Button>
+          <Button
+            icon={<QuestionOutlined />}
+            type="text"
+            onClick={handleShowHelpDialog}
+          >
+            帮助
           </Button>
         </div>
       </div>
@@ -102,8 +120,8 @@ function Editor() {
         </Row>
       </Canvas>
       <ConfigModal
-        visible={isModalVisible}
-        onVisibleChange={setIsModalVisible}
+        visible={isConfigModalVisible}
+        onVisibleChange={setIsConfigModalVisible}
       ></ConfigModal>
     </div>
   );

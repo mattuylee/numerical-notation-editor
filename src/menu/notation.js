@@ -1,33 +1,36 @@
-import { message } from "antd";
+import {
+  ArrowDownOutlined,
+  ArrowUpOutlined,
+  FontColorsOutlined,
+  MinusOutlined,
+  PlusOutlined,
+  RadiusSettingOutlined,
+  StopOutlined,
+} from "@ant-design/icons";
+import { Menu, message } from "antd";
 import state from "../store/state";
 import { findParagraphAndNotation } from "../util/editor";
 import { isNote } from "../util/notation";
 import { runInWrappedAction, wrappedAction } from "../store/history";
 
-const getNotationContextItems = (notation, paragraph) => {
+const getNotationContextMenu = (notation, paragraph) => {
   const hasTie = notation.tieTo;
-  return [
-    {
-      key: "octaveUp",
-      text: "升高一个八度",
-      visible: isNote(notation),
-      onClick: wrappedAction(() => {
+  const handleMenu = wrappedAction(function ({ key }) {
+    switch (key) {
+      case "octave-up":
         notation.octave += 1;
-      }),
-    },
-    {
-      key: "octaveDown",
-      text: "降低一个八度",
-      visible: isNote(notation),
-      onClick: wrappedAction(() => {
+        break;
+      case "octave-down":
         notation.octave -= 1;
-      }),
-    },
-    {
-      key: "tie",
-      text: notation.tieTo ? "删除连音线" : "从此处添加连音线到...",
-      visible: isNote(notation),
-      onClick: wrappedAction(() => {
+        break;
+      case "underline-add":
+        notation.underline += 1;
+        break;
+      case "underline-remove":
+        notation.underline -= 1;
+        notation.underline = Math.max(0, notation.underline);
+        break;
+      case "tie":
         if (!hasTie) {
           state.tieSourceKey = notation.key;
           return;
@@ -37,7 +40,58 @@ const getNotationContextItems = (notation, paragraph) => {
           tieDesc.tieTo = null;
         }
         notation.tieTo = null;
+        break;
+      case "break-underline":
+        notation.breakUnderline = !notation.breakUnderline;
+        break;
+    }
+  });
+
+  return (
+    <Menu onClick={handleMenu}>
+      <Menu.Item key="octave-up" icon={<ArrowUpOutlined />}>
+        升高一个八度（8）
+      </Menu.Item>
+      <Menu.Item key="octave-down" icon={<ArrowDownOutlined />}>
+        降低一个八度（Shift + 8）
+      </Menu.Item>
+      <Menu.Item key="underline-add" icon={<PlusOutlined />}>
+        添加增减时线（U）
+      </Menu.Item>
+      <Menu.Item key="underline-remove" icon={<MinusOutlined />}>
+        减少增减时线（Shift + U）
+      </Menu.Item>
+      <Menu.Item key="break-underline" icon={<StopOutlined />}>
+        {notation.breakUnderline ? "在此处延续增减时线" : "在此处打断增减时线"}
+      </Menu.Item>
+      <Menu.Item key="tie" icon={<RadiusSettingOutlined />}>
+        {notation.tieTo ? "删除连音线" : "从此处添加连音线到..."}
+      </Menu.Item>
+    </Menu>
+  );
+
+  return [
+    {
+      key: "octaveUp",
+      text: "升高一个八度（8）",
+      visible: isNote(notation),
+      onClick: wrappedAction(() => {
+        notation.octave += 1;
       }),
+    },
+    {
+      key: "octaveDown",
+      text: "降低一个八度（Shift + 8）",
+      visible: isNote(notation),
+      onClick: wrappedAction(() => {
+        notation.octave -= 1;
+      }),
+    },
+    {
+      key: "tie",
+      text: notation.tieTo ? "删除连音线" : "从此处添加连音线到...",
+      visible: isNote(notation),
+      onClick: wrappedAction(() => {}),
     },
     {
       key: "break-underline",
@@ -64,7 +118,7 @@ const getNotationContextItems = (notation, paragraph) => {
   ];
 };
 
-// ENHANCE: 改变<EditableContent>组件这个反人类的回调执行
+// ENHANCE: 使用EditableContent组件的overlay属性传入菜单
 // 执行选项回调。。
 function handleNotationContext(options, key) {
   runInWrappedAction(() => (state.shouldNotationBlurAfterClick = false));
@@ -72,4 +126,4 @@ function handleNotationContext(options, key) {
   callback && callback();
 }
 
-export { getNotationContextItems, handleNotationContext };
+export { getNotationContextMenu, handleNotationContext };

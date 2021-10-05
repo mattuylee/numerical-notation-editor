@@ -1,7 +1,11 @@
 import {
   FolderOpenOutlined,
+  HighlightOutlined,
+  MenuUnfoldOutlined,
   PlusOutlined,
+  RedoOutlined,
   SaveOutlined,
+  UndoOutlined,
 } from "@ant-design/icons";
 import { Menu } from "antd";
 import { action } from "mobx";
@@ -13,69 +17,8 @@ import { findParagraphAndNotation } from "../util/editor";
 import { go, runInWrappedAction, wrappedAction } from "../store/history";
 
 const { SubMenu } = Menu;
-const fileMenu = (
-  <Menu>
-    <Menu.Item key="create" icon={<PlusOutlined />}>
-      新建
-    </Menu.Item>
-    <Menu.Item key="open" icon={<FolderOpenOutlined />}>
-      打开
-    </Menu.Item>
-    <Menu.Item key="save" icon={<SaveOutlined />}>
-      保存
-    </Menu.Item>
-  </Menu>
-);
-const editMenu = (
-  <Menu onClick={handleMenu}>
-    <Menu.Item key="undo">撤销</Menu.Item>
-    <Menu.Item key="redo">重做</Menu.Item>
-    <Menu.Item key="reset-title">添加段落</Menu.Item>
-    <Menu.Item key="reset-title">重置歌曲名称</Menu.Item>
-    <Menu.Item key="reset-authors">重置作者信息</Menu.Item>
-  </Menu>
-);
 
-const convertMenu = (
-  <Menu key="tone">
-    <SubMenu key="convert-to" title="转到...">
-      <Menu.Item key="convert-to-C">1 = C</Menu.Item>
-      <Menu.Item key="convert-to-D">1 = D</Menu.Item>
-      <Menu.Item key="convert-to-E">1 = E</Menu.Item>
-      <Menu.Item key="convert-to-F">1 = F</Menu.Item>
-      <Menu.Item key="convert-to-G">1 = G</Menu.Item>
-      <Menu.Item key="convert-to-A">1 = A</Menu.Item>
-      <Menu.Item key="convert-to-B">1 = B</Menu.Item>
-      <Menu.Item key="convert-to-bC">
-        1 = <sup>♭</sup>C
-      </Menu.Item>
-      <Menu.Item key="convert-to-bD">
-        1 = <sup>♭</sup>D
-      </Menu.Item>
-      <Menu.Item key="convert-to-bE">
-        1 = <sup>♭</sup>E
-      </Menu.Item>
-      <Menu.Item key="convert-to-bF">
-        1 = <sup>♭</sup>F
-      </Menu.Item>
-      <Menu.Item key="convert-to-bG">
-        1 = <sup>♭</sup>G
-      </Menu.Item>
-      <Menu.Item key="convert-to-bA">
-        1 = <sup>♭</sup>A
-      </Menu.Item>
-      <Menu.Item key="convert-to-bB">
-        1 = <sup>♭</sup>B
-      </Menu.Item>
-    </SubMenu>
-    <Menu.Item key="convert-up">升高一个音</Menu.Item>
-    <Menu.Item key="convert-down">降低一个音</Menu.Item>
-    <Menu.Item key="convert-up8">升高一个八度</Menu.Item>
-    <Menu.Item key="convert-down8">降低一个八度</Menu.Item>
-  </Menu>
-);
-
-function handleMenu({ key }) {
+const handleEditMenu = wrappedAction(({ key }) => {
   switch (key) {
     case "undo":
       go(-1);
@@ -96,7 +39,11 @@ function handleMenu({ key }) {
       ];
       break;
   }
-}
+});
+const handleConvertMenu = wrappedAction(() => {
+
+  console.log(111);
+});
 
 const handleClick = wrappedAction((ev) => {
   if (state.shouldNotationBlurAfterClick) {
@@ -216,5 +163,78 @@ const handleKeyPress = wrappedAction((ev) => {
       break;
   }
 });
+
+
+const fileMenu = (
+  <Menu>
+    <Menu.Item key="create" icon={<PlusOutlined />}>
+      新建
+    </Menu.Item>
+    <Menu.Item key="open" icon={<FolderOpenOutlined />}>
+      打开
+    </Menu.Item>
+    <Menu.Item key="save" icon={<SaveOutlined />}>
+      保存
+    </Menu.Item>
+  </Menu>
+);
+const editMenu = (
+  <Menu onClick={handleEditMenu}>
+    <Menu.Item key="undo" icon={<UndoOutlined />}>
+      撤销
+    </Menu.Item>
+    <Menu.Item key="redo" icon={<RedoOutlined />}>
+      重做
+    </Menu.Item>
+    <Menu.Item key="add-paragraph" icon={<MenuUnfoldOutlined />}>
+      添加段落
+    </Menu.Item>
+    <Menu.Item key="reset-title" icon={<HighlightOutlined />}>
+      重置歌曲名称
+    </Menu.Item>
+    <Menu.Item key="reset-authors" icon={<HighlightOutlined />}>
+      重置作者信息
+    </Menu.Item>
+  </Menu>
+);
+
+const convertMenu = (
+  <Menu key="tone" onClick={handleConvertMenu}>
+    <SubMenu key="convert-to" title="转到...">
+      <Menu.Item key="convert-to-C">1 = C</Menu.Item>
+      <Menu.Item key="convert-to-D">1 = D</Menu.Item>
+      <Menu.Item key="convert-to-E">1 = E</Menu.Item>
+      <Menu.Item key="convert-to-F">1 = F</Menu.Item>
+      <Menu.Item key="convert-to-G">1 = G</Menu.Item>
+      <Menu.Item key="convert-to-A">1 = A</Menu.Item>
+      <Menu.Item key="convert-to-B">1 = B</Menu.Item>
+      <Menu.Item key="convert-to-bC">
+        1 = <sup>♭</sup>C
+      </Menu.Item>
+      <Menu.Item key="convert-to-bD">
+        1 = <sup>♭</sup>D
+      </Menu.Item>
+      <Menu.Item key="convert-to-bE">
+        1 = <sup>♭</sup>E
+      </Menu.Item>
+      <Menu.Item key="convert-to-bF">
+        1 = <sup>♭</sup>F
+      </Menu.Item>
+      <Menu.Item key="convert-to-bG">
+        1 = <sup>♭</sup>G
+      </Menu.Item>
+      <Menu.Item key="convert-to-bA">
+        1 = <sup>♭</sup>A
+      </Menu.Item>
+      <Menu.Item key="convert-to-bB">
+        1 = <sup>♭</sup>B
+      </Menu.Item>
+    </SubMenu>
+    <Menu.Item key="convert-up">升高一个音</Menu.Item>
+    <Menu.Item key="convert-down">降低一个音</Menu.Item>
+    <Menu.Item key="convert-up8">升高一个八度</Menu.Item>
+    <Menu.Item key="convert-down8">降低一个八度</Menu.Item>
+  </Menu>
+);
 
 export { fileMenu, editMenu, convertMenu, handleKeyPress, handleClick };

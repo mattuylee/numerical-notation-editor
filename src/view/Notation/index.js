@@ -4,15 +4,9 @@ import { observer } from "mobx-react-lite";
 import EditableContent from "../../component/EditableContent";
 import state from "../../store/state";
 import store from "../../store/global";
-import P, {
-  calcNotationPrefixOffset,
-  calcSubTextWidth,
-} from "../../util/placement";
+import P, { calcSubTextWidth } from "../../util/placement";
 import { findParagraphAndNotation } from "../../util/editor";
-import {
-  getNotationContextItems,
-  handleNotationContext,
-} from "../../menu/notation";
+import { getNotationContextMenu } from "../../menu/notation";
 import { notations } from "../../util/notation";
 import { wrappedAction } from "../../store/history";
 import Row from "../Row";
@@ -128,13 +122,11 @@ function Notation({ offsetX, notation, paragraph }) {
     ));
   };
 
-  const options = getNotationContextItems(notation, paragraph);
   return (
     <EditableContent
       inputType="select"
-      options={options}
       popoverProps={{ trigger: "context" }}
-      onChange={handleNotationContext.bind(null, options)}
+      overlay={getNotationContextMenu(notation, paragraph)}
     >
       <Row
         editable

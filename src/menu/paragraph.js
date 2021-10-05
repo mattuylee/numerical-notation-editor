@@ -11,8 +11,8 @@ import store from "../store/global";
 import { go, runInWrappedAction, wrappedAction } from "../store/history";
 
 function getParagraphMenuOptions(paragraph) {
-  return [];
   const handleMenu = wrappedAction(({ key }) => {
+    console.log(1111111111, key);
     switch (key) {
       case "justify-auto":
         paragraph.alignJustify = null;
@@ -46,12 +46,4 @@ function getParagraphMenuOptions(paragraph) {
   );
 }
 
-// ENHANCE: 同notation的菜单项处理函数，改改改
-// TODO: working 现在就改！然后EditableContent应该直接传入antd的菜单项
-_function handleSelectParagraphMenu(options, key) {
-  runInWrappedAction(() => (state.shouldNotationBlurAfterClick = false));
-  const callback = options.find((ops) => ops.key === key)?.onClick;
-  callback && callback();
-}
-
-export { getParagraphMenuOptions, handleSelectParagraphMenu };
+export { getParagraphMenuOptions };

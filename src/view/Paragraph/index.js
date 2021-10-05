@@ -166,8 +166,7 @@ function Paragraph({ paragraph, offsetY, alignJustify }) {
     return (
       <EditableContent
         inputType="select"
-        options={getParagraphMenuOptions(paragraph)}
-        onChange={handleSelectParagraphMenu}
+        overlay={getParagraphMenuOptions(paragraph)}
       >
         <rect
           x={-P.xWidth / 2}

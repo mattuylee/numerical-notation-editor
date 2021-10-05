@@ -13,7 +13,7 @@ const authorContextMenu = [
   {
     key: "create",
     text: "添加",
-    icon: <PlusOutlined style={{ color: "grey" }} />,
+    icon: <PlusOutlined />,
     onClick: () => {
       store.authors.push("作者信息");
     },
@@ -21,7 +21,7 @@ const authorContextMenu = [
   {
     key: "delete",
     text: "删除",
-    icon: <DeleteOutlined style={{ color: "grey" }} />,
+    icon: <DeleteOutlined />,
     onClick: (index) => {
       store.authors.splice(index, 1);
     },
@@ -31,7 +31,7 @@ const blockContextMenu = [
   {
     key: "create",
     text: "添加作者信息",
-    icon: <PlusOutlined style={{ color: "grey" }} />,
+    icon: <PlusOutlined />,
     onClick: () => {
       store.authors.push("【记谱者】  记谱");
     },
