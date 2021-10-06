@@ -7,7 +7,7 @@ import {
   SettingOutlined,
 } from "@ant-design/icons";
 import { observer } from "mobx-react-lite";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect } from "react";
 import state from "../../store/state";
 import store from "../../store/global";
 import P, {
@@ -31,7 +31,6 @@ import Row from "../Row";
 import Styles from "./index.module.css";
 
 function Editor() {
-  const [isHelpModalVisible, setIsHelpModalVisible] = useState(false);
   const heightCache = [];
   function accumulate(index) {
     const paragraphs = store.paragraphs || [];
@@ -45,23 +44,18 @@ function Editor() {
     height += calcParagraphAboveOffset(paragraphs[index]);
     return height;
   }
-  const handleChangeConfigModalVisibility = useCallback(
-    unwrappedAction((visible) => {
-      state.configDialogVisible = visible;
-    }, [])
-  );
-  const handleChangeHelpModalVisibility = useCallback(
-    unwrappedAction((visible) => {
-      state.helpDialogVisible = visible;
-    }, [])
-  );
-  const handleShowConfigDialog = useCallback(() => {
+  const handleChangeConfigModalVisibility = unwrappedAction((visible) => {
+    state.configDialogVisible = visible;
+  });
+  const handleChangeHelpModalVisibility = unwrappedAction((visible) => {
+    state.helpDialogVisible = visible;
+  });
+  const handleShowConfigDialog = () => {
     handleChangeConfigModalVisibility(true);
-  }, []);
-  const handleShowHelpDialog = useCallback(() => {
+  };
+  const handleShowHelpDialog = () => {
     handleChangeHelpModalVisibility(true);
-  }, []);
-
+  };
   useEffect(() => {
     document.addEventListener("keydown", handleKeyPress);
     return () => {

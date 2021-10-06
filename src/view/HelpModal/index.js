@@ -1,7 +1,5 @@
 import { Button, Modal } from "antd";
 import { useCallback } from "react";
-import state from "../../store/state";
-import { unwrappedAction } from "../../store/history";
 import Styles from "./index.module.css";
 
 function KeyboardDescItem({ kbd, desc }) {

@@ -104,7 +104,7 @@ const EditableContent = function (
           ))}
       </Menu>
     );
-  }, [initialValue, options, handleConfirm]);
+  }, [initialValue, options, handleConfirm, handleHideContextMenu, overlay]);
   let renderContent, renderPopover;
   switch (inputType) {
     case "select":

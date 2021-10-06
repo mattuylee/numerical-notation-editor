@@ -1,6 +1,5 @@
-import { action } from "mobx";
 import { observer } from "mobx-react-lite";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import EditableContent from "../../../component/EditableContent";
 import store from "../../../store/global";
 import { wrappedAction } from "../../../store/history";

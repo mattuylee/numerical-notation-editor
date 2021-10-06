@@ -1,4 +1,3 @@
-import { action } from "mobx";
 import { message } from "antd";
 import { observer } from "mobx-react-lite";
 import EditableContent from "../../component/EditableContent";
@@ -7,7 +6,7 @@ import store from "../../store/global";
 import P, { calcSubTextWidth } from "../../util/placement";
 import { findParagraphAndNotation } from "../../util/editor";
 import { getNotationContextMenu } from "../../menu/notation";
-import { notations } from "../../util/notation";
+import { isNote, notations } from "../../util/notation";
 import { wrappedAction } from "../../store/history";
 import Row from "../Row";
 import Text from "../Text";
@@ -40,11 +39,13 @@ function Notation({ offsetX, notation, paragraph }) {
         state.tieSourceKey = null;
         return;
       }
-      if (sourceParagraph.notations.includes(notation)) {
+      if (!sourceParagraph.notations.includes(notation)) {
+        message.warn("只允许相同段落的音符相连！");
+      } else if (!isNote(notation)) {
+        message.warn("只允许在音符上添加连音线！");
+      } else {
         sourceNotation.tieTo = notation.key;
         notation.tieTo = sourceNotation.key;
-      } else {
-        message.warn("只允许相同段落的音符相连！");
       }
       state.tieSourceKey = null;
     }

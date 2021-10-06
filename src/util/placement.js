@@ -6,22 +6,6 @@ import store from "../store/global";
 let canvas, context2D, defaultFontFamily;
 let measureSvgEl, measureTextEl;
 
-function _calcFontData(fontSize) {
-  const span = document.createElement("span");
-  span.style.fontFamily = window.getComputedStyle(document.body).fontFamily;
-  span.style.fontSize = `${fontSize}px`;
-  span.style.visibility = "hidden";
-  span.style.position = "absolute";
-  span.style.display = "inline-block";
-  span.textContent = "x";
-  document.body.appendChild(span);
-  const data = span.getBoundingClientRect();
-  return {
-    xWidth: data.width,
-    xHeight: data.height,
-  };
-}
-
 function _initializeCanvas(fontSize) {
   if (!canvas) {
     canvas = document.createElement("canvas");
@@ -151,7 +135,8 @@ function calcParagraphContentHeight(paragraph) {
   }
   let tieHeight = 0;
   if (_hasTie(paragraph)) {
-    tieHeight = placement.maxTieHeight;
+    // FIXME: 应该计算连音线高度
+    // tieHeight = placement.maxTieHeight;
   }
   // 段落高度不是最高的音符的高度，而是上边偏移最大的音符的上部分偏移量+下边偏移最
   // 大的音符的下部分偏移量
@@ -184,7 +169,8 @@ function calcParagraphAboveOffset(paragraph) {
   }
   let tieHeight = 0;
   if (_hasTie(paragraph)) {
-    tieHeight = placement.maxTieHeight;
+    // FIXME: 应该计算连音线高度
+    // tieHeight = placement.maxTieHeight;
   }
   const notationOffset = notations
     .map((n) => calcNotationAboveOffset(n))

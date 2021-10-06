@@ -1,4 +1,3 @@
-import { action } from "mobx";
 import { message } from "antd";
 import { observer } from "mobx-react-lite";
 import EditableContent from "../../../component/EditableContent";

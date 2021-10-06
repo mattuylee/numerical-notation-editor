@@ -1,4 +1,4 @@
-import { Button, Form, Input, InputNumber, Modal } from "antd";
+import { Button, Form, Input, Modal } from "antd";
 import { observer } from "mobx-react-lite";
 import { useCallback } from "react";
 import store from "../../store/global";
@@ -26,25 +26,28 @@ function ConfigModal({ visible, onVisibleChange }) {
   const handleClose = useCallback(() => {
     onVisibleChange?.call(null, false);
   }, [onVisibleChange]);
-  const resetConfig = useCallback(
-    unwrappedAction(() => {
-      const {
-        canvasWidth,
-        canvasHeight,
-        marginTop,
-        marginHorizontal,
-      } = getDefaultGlobalData();
-      Object.assign(store, {
-        canvasWidth,
-        canvasHeight,
-        marginTop,
-        marginHorizontal,
-      });
-    })
-  );
+  const resetConfig = unwrappedAction(() => {
+    const {
+      canvasWidth,
+      canvasHeight,
+      marginTop,
+      marginHorizontal,
+      gapBetweenParagraph,
+      gapBetweenNotation,
+    } = getDefaultGlobalData();
+    Object.assign(store, {
+      canvasWidth,
+      canvasHeight,
+      marginTop,
+      marginHorizontal,
+      gapBetweenParagraph,
+      gapBetweenNotation,
+    });
+  });
 
   return (
     <Modal
+      style={{ top: 20 }}
       visible={visible}
       title="配置"
       onCancel={handleClose}
@@ -87,6 +90,14 @@ function ConfigModal({ visible, onVisibleChange }) {
         <ImmediateNumberConfigItem
           label="左右边距"
           propertyName="marginHorizontal"
+        />
+        <ImmediateNumberConfigItem
+          label="段间距"
+          propertyName="gapBetweenParagraph"
+        />
+        <ImmediateNumberConfigItem
+          label="音符间距"
+          propertyName="gapBetweenNotation"
         />
       </Form>
     </Modal>

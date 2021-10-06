@@ -1,6 +1,5 @@
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { Modal } from "antd";
-import { action } from "mobx";
 import { observer } from "mobx-react-lite";
 import EditableContent from "../../../component/EditableContent";
 import P from "../../../util/placement";

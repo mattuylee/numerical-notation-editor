@@ -1,3 +1,5 @@
+import { createNotation, notations as N } from "./notation";
+
 // 新建段落
 function createParagraph(initial) {
   const p = {
@@ -12,5 +14,16 @@ function createParagraph(initial) {
   }
   return p;
 }
+function createParagraphWithNotations() {
+  return createParagraph({
+    notations: [
+      createNotation({ note: "0" }),
+      createNotation({ note: "0" }),
+      createNotation({ note: "0" }),
+      createNotation({ note: "0" }),
+      createNotation({ note: N.separator }),
+    ],
+  });
+}
 
-export { createParagraph };
+export { createParagraph, createParagraphWithNotations };

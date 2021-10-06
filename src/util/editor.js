@@ -1,6 +1,5 @@
 import store from "../store/global";
-import { createNotation, notations } from "../util/notation";
-import { createParagraph } from "../util/paragraph";
+import { createParagraphWithNotations } from "../util/paragraph";
 import { VERSION } from "./version";
 
 const initialData = {
@@ -16,7 +15,7 @@ const initialData = {
   gapAfterTitle: 16,
   gapAfterHeader: 32,
   gapBetweenParagraph: 32,
-  gapBetweenNotation: 8,
+  gapBetweenNotation: 16,
   beat: [4, 4],
   speed: 75,
   authors: ["佚名  作词", "简谱编辑器  制谱"],
@@ -28,17 +27,7 @@ function getDefaultGlobalData() {
 }
 function getDefaultGlobalDataWidthNotations() {
   const d = getDefaultGlobalData();
-  d.paragraphs = [
-    createParagraph({
-      notations: [
-        createNotation({ note: "0" }),
-        createNotation({ note: "0" }),
-        createNotation({ note: "0" }),
-        createNotation({ note: "0" }),
-        createNotation({ note: notations.separator }),
-      ],
-    }),
-  ];
+  d.paragraphs = [createParagraphWithNotations()];
   return d;
 }
 
@@ -55,6 +44,7 @@ function findParagraphAndNotation(key) {
       res.paragraphIndex = i;
       return true;
     }
+    return false;
   });
   return res;
 }

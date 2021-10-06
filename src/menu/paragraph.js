@@ -32,6 +32,8 @@ function getParagraphMenuOptions(paragraph) {
           store.paragraphs.splice(idx, 1);
         }
         break;
+      default:
+        break;
     }
   });
 

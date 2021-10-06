@@ -1,4 +1,3 @@
-import { Button, Menu, Upload } from "antd";
 import {
   FolderOpenOutlined,
   HighlightOutlined,
@@ -8,10 +7,14 @@ import {
   SaveOutlined,
   UndoOutlined,
 } from "@ant-design/icons";
+import { Menu } from "antd";
 import state from "../store/state";
 import store from "../store/global";
 import { createNotation, isNote, notations as N } from "../util/notation";
-import { createParagraph } from "../util/paragraph";
+import {
+  createParagraph,
+  createParagraphWithNotations,
+} from "../util/paragraph";
 import { exportFile, loadFile, saveFile } from "../util/file";
 import { findParagraphAndNotation } from "../util/editor";
 import {
@@ -55,19 +58,11 @@ const handleEditMenu = wrappedAction(({ key }) => {
       ];
       break;
     case "add-paragraph": {
-      store.paragraphs.push(
-        createParagraph({
-          notations: [
-            createNotation({ note: "0" }),
-            createNotation({ note: "0" }),
-            createNotation({ note: "0" }),
-            createNotation({ note: "0" }),
-            createNotation({ note: N.separator }),
-          ],
-        })
-      );
+      store.paragraphs.push(createParagraphWithNotations());
       break;
     }
+    default:
+      break;
   }
 });
 const handleConvertMenu = wrappedAction(() => {
@@ -176,8 +171,19 @@ const handleKeyPress = wrappedAction((ev) => {
       }
       case inputKey === "enter" && ctrl && !shift: {
         const newNotation = createNotation();
-        paragraph.notations.splice(notationIndex + 1, 0, newNotation);
-        state.selectedNotationKey = newNotation.key;
+        if (
+          notationIndex === paragraph.notations.length - 1 &&
+          paragraphIndex === store.paragraphs.length - 1
+        ) {
+          // 在最后一个音符时ctrl+enter插入新段落并创建符号
+          store.paragraphs.push(createParagraph({ notations: [newNotation] }));
+          state.selectedNotationKey = store.paragraphs
+            .at(-1)
+            .notations.at(0).key;
+        } else {
+          paragraph.notations.splice(notationIndex + 1, 0, newNotation);
+          state.selectedNotationKey = newNotation.key;
+        }
         break;
       }
       case inputKey === "j" && !ctrl && !shift: {
@@ -218,6 +224,8 @@ const handleKeyPress = wrappedAction((ev) => {
         paragraph.alignJustify = !paragraph.alignJustify;
         break;
       }
+      default:
+        break;
     }
   } else {
     // 仅未选中符号时
@@ -226,7 +234,10 @@ const handleKeyPress = wrappedAction((ev) => {
         state.selectedNotationKey =
           state.lastSelectedNotationKey ||
           store.paragraphs?.at(0)?.notations?.at(0).key;
+        break;
       }
+      default:
+        break;
     }
   }
   // 全局
@@ -261,6 +272,8 @@ const handleKeyPress = wrappedAction((ev) => {
       }
       break;
     }
+    default:
+      break;
   }
 });
 

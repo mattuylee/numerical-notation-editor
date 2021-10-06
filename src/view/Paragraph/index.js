@@ -8,15 +8,11 @@ import P, {
   calcParagraphContentHeight,
   calcParagraphWidth,
 } from "../../util/placement";
-import {
-  getParagraphMenuOptions,
-  handleSelectParagraphMenu,
-} from "../../menu/paragraph";
+import { getParagraphMenuOptions } from "../../menu/paragraph";
 import Notation from "../Notation";
 import Row from "../Row";
 
 function Paragraph({ paragraph, offsetY, alignJustify }) {
-  console.log("render paragraph");
   const notations = paragraph.notations || [];
   const widthCache = [];
   let itemFlexOffset = 0;

@@ -1,4 +1,4 @@
-import { action, intercept, keys, runInAction, toJS } from "mobx";
+import { action, runInAction, toJS } from "mobx";
 import globalStore from "./global";
 
 const storeHistory = [];
@@ -43,12 +43,10 @@ function go(span) {
     Math.max(0, cursor + span),
     storeHistory.length - 1
   );
-  console.log("go ", span);
   if (newCursor === cursor) {
     return;
   }
   cursor = newCursor;
-  console.log("gone to ", newCursor);
   Object.assign(globalStore, storeHistory[newCursor]);
 }
 
@@ -64,11 +62,6 @@ function executeAction(actionFunc, ...args) {
   if (!_isEqual(storeHistory[cursor], current)) {
     storeHistory[++cursor] = current;
     storeHistory.length = cursor + 1;
-    console.log(
-      "pushed history, length & cursor: ",
-      storeHistory.length,
-      cursor
-    );
     if (storeHistory.length > 256) {
       storeHistory.splice(0, 256 - storeHistory.length);
     }
