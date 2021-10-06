@@ -59,8 +59,7 @@ function Notation({ offsetX, notation, paragraph }) {
   let topDecoratorOffset = 0;
   if (notation.octave > 0) {
     // 如果有高八度圆点，将顶部装饰符渲染到其上方
-    topDecoratorOffset =
-      octaveInitialOffset - octaveStepOffset * Math.abs(notation.octave);
+    topDecoratorOffset = octaveStepOffset * Math.abs(notation.octave);
   }
 
   const renderPrefixSups = () => {
