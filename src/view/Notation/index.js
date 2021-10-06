@@ -120,7 +120,6 @@ function Notation({ offsetX, notation, paragraph }) {
       ></circle>
     ));
   };
-
   return (
     <EditableContent
       inputType="select"

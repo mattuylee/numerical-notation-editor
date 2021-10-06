@@ -1,8 +1,10 @@
 import {
   ArrowDownOutlined,
   ArrowUpOutlined,
+  DeleteOutlined,
   FontColorsOutlined,
   MinusOutlined,
+  PauseOutlined,
   PlusOutlined,
   RadiusSettingOutlined,
   StopOutlined,
@@ -10,27 +12,14 @@ import {
 import { Menu, message } from "antd";
 import state from "../store/state";
 import { findParagraphAndNotation } from "../util/editor";
-import { isNote } from "../util/notation";
+import { isNote, isSeparator } from "../util/notation";
 import { runInWrappedAction, wrappedAction } from "../store/history";
 
 const getNotationContextMenu = (notation, paragraph) => {
   const hasTie = notation.tieTo;
   const handleMenu = wrappedAction(function ({ key }) {
-    switch (key) {
-      case "octave-up":
-        notation.octave += 1;
-        break;
-      case "octave-down":
-        notation.octave -= 1;
-        break;
-      case "underline-add":
-        notation.underline += 1;
-        break;
-      case "underline-remove":
-        notation.underline -= 1;
-        notation.underline = Math.max(0, notation.underline);
-        break;
-      case "tie":
+    switch (true) {
+      case key === "tie":
         if (!hasTie) {
           state.tieSourceKey = notation.key;
           return;
@@ -41,31 +30,34 @@ const getNotationContextMenu = (notation, paragraph) => {
         }
         notation.tieTo = null;
         break;
-      case "break-underline":
+      case key === "break-underline":
         notation.breakUnderline = !notation.breakUnderline;
         break;
+      case key.startsWith("separator-"): {
+        const separator = key.split("-", 2)[1];
+        notation.note = separator;
+        break;
+      }
     }
   });
 
   return (
-    <Menu onClick={handleMenu}>
-      <Menu.Item key="octave-up" icon={<ArrowUpOutlined />}>
-        升高一个八度（8）
-      </Menu.Item>
-      <Menu.Item key="octave-down" icon={<ArrowDownOutlined />}>
-        降低一个八度（Shift + 8）
-      </Menu.Item>
-      <Menu.Item key="underline-add" icon={<PlusOutlined />}>
-        添加增减时线（U）
-      </Menu.Item>
-      <Menu.Item key="underline-remove" icon={<MinusOutlined />}>
-        减少增减时线（Shift + U）
-      </Menu.Item>
-      <Menu.Item key="break-underline" icon={<StopOutlined />}>
-        {notation.breakUnderline ? "在此处延续增减时线" : "在此处打断增减时线"}
-      </Menu.Item>
-      <Menu.Item key="tie" icon={<RadiusSettingOutlined />}>
-        {notation.tieTo ? "删除连音线" : "从此处添加连音线到..."}
+    // ENHANCE: 分音符类型显示菜单项
+    <Menu onClick={handleMenu} style={{ minWidth: "80px" }}>
+      {
+        <Menu.Item key="break-underline" icon={<StopOutlined />}>
+          {notation.breakUnderline
+            ? "在此处延续增减时线"
+            : "在此处打断增减时线"}
+        </Menu.Item>
+      }
+      {
+        <Menu.Item key="tie" icon={<RadiusSettingOutlined />}>
+          {notation.tieTo ? "删除连音线" : "从此处添加连音线到..."}
+        </Menu.Item>
+      }
+      <Menu.Item key="delete" icon={<DeleteOutlined />}>
+        删除
       </Menu.Item>
     </Menu>
   );

@@ -1,10 +1,12 @@
 import store from "../store/global";
+import { createNotation, notations } from "../util/notation";
+import { createParagraph } from "../util/paragraph";
 import { VERSION } from "./version";
 
 const initialData = {
   version: VERSION,
-  canvasWidth: 1024,
-  canvasHeight: 1448,
+  canvasWidth: 896,
+  canvasHeight: 1024,
   defaultFontSize: 16,
   defaultSubFontSize: 12,
   title: "无标题",
@@ -21,8 +23,23 @@ const initialData = {
   notations: [],
 };
 
-function getInitialGlobalData() {
+function getDefaultGlobalData() {
   return JSON.parse(JSON.stringify(initialData));
+}
+function getDefaultGlobalDataWidthNotations() {
+  const d = getDefaultGlobalData();
+  d.paragraphs = [
+    createParagraph({
+      notations: [
+        createNotation({ note: "0" }),
+        createNotation({ note: "0" }),
+        createNotation({ note: "0" }),
+        createNotation({ note: "0" }),
+        createNotation({ note: notations.separator }),
+      ],
+    }),
+  ];
+  return d;
 }
 
 // 根据key查找符号在全局记录中的位置
@@ -42,4 +59,8 @@ function findParagraphAndNotation(key) {
   return res;
 }
 
-export { getInitialGlobalData, findParagraphAndNotation };
+export {
+  getDefaultGlobalData,
+  findParagraphAndNotation,
+  getDefaultGlobalDataWidthNotations,
+};

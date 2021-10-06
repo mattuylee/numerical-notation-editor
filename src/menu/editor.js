@@ -8,11 +8,10 @@ import {
   UndoOutlined,
 } from "@ant-design/icons";
 import { Menu } from "antd";
-import { action } from "mobx";
-import Notation from "../view/Notation";
 import state from "../store/state";
 import store from "../store/global";
 import { createNotation, isNote, notations as N } from "../util/notation";
+import { createParagraph } from "../util/paragraph";
 import { findParagraphAndNotation } from "../util/editor";
 import { go, runInWrappedAction, wrappedAction } from "../store/history";
 
@@ -38,15 +37,30 @@ const handleEditMenu = wrappedAction(({ key }) => {
         "【记谱者】  记谱",
       ];
       break;
+    case "add-paragraph": {
+      store.paragraphs.push(
+        createParagraph({
+          notations: [
+            createNotation({ note: "0" }),
+            createNotation({ note: "0" }),
+            createNotation({ note: "0" }),
+            createNotation({ note: "0" }),
+            createNotation({ note: N.separator }),
+          ],
+        })
+      );
+      break;
+    }
   }
 });
 const handleConvertMenu = wrappedAction(() => {
-
   console.log(111);
 });
 
+// 画布上的点击事件
 const handleClick = wrappedAction((ev) => {
-  if (state.shouldNotationBlurAfterClick) {
+  if (state.shouldNotationBlurAfterClick && state.selectedNotationKey) {
+    state.lastSelectedNotationKey = state.selectedNotationKey;
     state.selectedNotationKey = null;
   }
   state.shouldNotationBlurAfterClick = true;
@@ -104,7 +118,7 @@ const handleKeyPress = wrappedAction((ev) => {
           notation.prefixSups.shift();
         }
         break;
-      case inputKey === "b" && !ctrl && !shift:
+      case inputKey === "b" && !ctrl && !shift: {
         if (notation.prefixSups.indexOf("♭") !== 0) {
           if (notation.prefixSups[0] === "♯") {
             notation.prefixSups.shift();
@@ -114,14 +128,17 @@ const handleKeyPress = wrappedAction((ev) => {
           notation.prefixSups.shift();
         }
         break;
-      case inputKey === "~" && !ctrl:
+      }
+      case inputKey === "~" && !ctrl: {
         if (notation.topDecorators.includes("~")) {
           notation.topDecorators.splice(notation.topDecorators.indexOf("~"), 1);
         } else {
           notation.topDecorators.push("~");
         }
         break;
-      case inputKey === "enter" && !ctrl && !shift:
+      }
+      case inputKey === "l" && !ctrl && !shift:
+      case inputKey === "enter" && !ctrl && !shift: {
         if (paragraph.notations[notationIndex + 1]) {
           state.selectedNotationKey =
             paragraph.notations[notationIndex + 1].key;
@@ -131,39 +148,90 @@ const handleKeyPress = wrappedAction((ev) => {
           state.selectedNotationKey = nextNotation.key;
         }
         break;
-      case inputKey === "enter" && !ctrl && shift:
+      }
+      case inputKey === "h" && !ctrl && !shift:
+      case inputKey === "enter" && !ctrl && shift: {
         if (paragraph.notations[notationIndex - 1]) {
           state.selectedNotationKey =
             paragraph.notations[notationIndex - 1].key;
         }
         break;
-      case inputKey === "enter" && ctrl && !shift:
+      }
+      case inputKey === "enter" && ctrl && !shift: {
         const newNotation = createNotation();
         paragraph.notations.splice(notationIndex + 1, 0, newNotation);
         state.selectedNotationKey = newNotation.key;
         break;
-      case inputKey === "delete":
+      }
+      case inputKey === "j" && !ctrl && !shift: {
+        const nextParagraph = store.paragraphs[paragraphIndex + 1];
+        if (nextParagraph?.notations?.length) {
+          const nextNotation =
+            nextParagraph.notations[notationIndex] ||
+            nextParagraph.notations.at(-1);
+          state.selectedNotationKey = nextNotation.key;
+        }
+        break;
+      }
+      case inputKey === "k" && !ctrl && !shift: {
+        const prevParagraph = store.paragraphs[paragraphIndex - 1];
+        if (prevParagraph?.notations?.length) {
+          const prevNotation =
+            prevParagraph.notations[notationIndex] ||
+            prevParagraph.notations.at(-1);
+          state.selectedNotationKey = prevNotation.key;
+        }
+        break;
+      }
+      case inputKey === "delete" && !ctrl && !shift: {
         paragraph.notations.splice(notationIndex, 1);
         const currNotation =
           paragraph.notations[notationIndex] ||
           paragraph.notations[notationIndex - 1];
         state.selectedNotationKey = currNotation?.key;
         break;
+      }
+      case inputKey === "=" && !ctrl && !shift: {
+        if (typeof paragraph.alignJustify !== "boolean") {
+          paragraph.alignJustify = !(
+            paragraphIndex ===
+            store.paragraphs.length - 1
+          );
+        }
+        paragraph.alignJustify = !paragraph.alignJustify;
+        break;
+      }
+    }
+  } else {
+    // 仅未选中符号时
+    switch (true) {
+      case ["h", "j", "k", "l"].includes(inputKey): {
+        state.selectedNotationKey =
+          state.lastSelectedNotationKey ||
+          store.paragraphs?.at(0)?.notations?.at(0).key;
+      }
     }
   }
+  // 全局
   switch (true) {
     case inputKey === "z" && ctrl && !shift:
-      console.log("undo");
       go(-1);
       break;
     case inputKey === "y" && ctrl && !shift:
     case inputKey === "z" && ctrl && shift:
-      console.log("redo");
       go(1);
       break;
+    case inputKey === "?" && !ctrl: {
+      if (state.helpDialogVisible) {
+        state.helpDialogVisible = false;
+      } else {
+        state.configDialogVisible = false;
+        state.helpDialogVisible = true;
+      }
+      break;
+    }
   }
 });
-
 
 const fileMenu = (
   <Menu>

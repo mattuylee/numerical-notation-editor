@@ -8,6 +8,7 @@ import {
 } from "@ant-design/icons";
 import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useState } from "react";
+import state from "../../store/state";
 import store from "../../store/global";
 import P, {
   calcParagraphAboveOffset,
@@ -20,15 +21,16 @@ import {
   handleClick,
   handleKeyPress,
 } from "../../menu/editor";
+import { unwrappedAction } from "../../store/history";
 import Canvas from "../Canvas";
 import ConfigModal from "../ConfigModal";
 import Header from "../Header";
+import HelpModal from "../HelpModal";
 import Paragraph from "../Paragraph";
 import Row from "../Row";
 import Styles from "./index.module.css";
 
 function Editor() {
-  const [isConfigModalVisible, setIsConfigModalVisible] = useState(false);
   const [isHelpModalVisible, setIsHelpModalVisible] = useState(false);
   const heightCache = [];
   function accumulate(index) {
@@ -43,19 +45,27 @@ function Editor() {
     height += calcParagraphAboveOffset(paragraphs[index]);
     return height;
   }
+  const handleChangeConfigModalVisibility = useCallback(
+    unwrappedAction((visible) => {
+      state.configDialogVisible = visible;
+    }, [])
+  );
+  const handleChangeHelpModalVisibility = useCallback(
+    unwrappedAction((visible) => {
+      state.helpDialogVisible = visible;
+    }, [])
+  );
   const handleShowConfigDialog = useCallback(() => {
-    setIsConfigModalVisible(true);
+    handleChangeConfigModalVisibility(true);
   }, []);
   const handleShowHelpDialog = useCallback(() => {
-    setIsHelpModalVisible(true);
+    handleChangeHelpModalVisibility(true);
   }, []);
 
   useEffect(() => {
     document.addEventListener("keydown", handleKeyPress);
-    document.addEventListener("click", handleClick);
     return () => {
       document.removeEventListener("keydown", handleKeyPress);
-      document.removeEventListener("click", handleClick);
     };
   }, []);
 
@@ -100,7 +110,7 @@ function Editor() {
           </Button>
         </div>
       </div>
-      <Canvas>
+      <Canvas onClick={handleClick}>
         <Header />
         <Row offsetX={store.marginHorizontal} offsetY={P.headerOffsetY}>
           {store.paragraphs.map((p, i) => {
@@ -120,9 +130,13 @@ function Editor() {
         </Row>
       </Canvas>
       <ConfigModal
-        visible={isConfigModalVisible}
-        onVisibleChange={setIsConfigModalVisible}
+        visible={state.configDialogVisible}
+        onVisibleChange={handleChangeConfigModalVisibility}
       ></ConfigModal>
+      <HelpModal
+        visible={state.helpDialogVisible}
+        onVisibleChange={handleChangeHelpModalVisibility}
+      ></HelpModal>
     </div>
   );
 }

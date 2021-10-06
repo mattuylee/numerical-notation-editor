@@ -2,7 +2,8 @@ import { Button, Form, Input, InputNumber, Modal } from "antd";
 import { observer } from "mobx-react-lite";
 import { useCallback } from "react";
 import store from "../../store/global";
-import { unwrappedAction, wrappedAction } from "../../store/history";
+import { getDefaultGlobalData } from "../../util/editor";
+import { unwrappedAction } from "../../store/history";
 
 const ImmediateNumberConfigInput = observer(({ propertyName, ...props }) => {
   const handleChange = unwrappedAction((ev) => {
@@ -25,17 +26,36 @@ function ConfigModal({ visible, onVisibleChange }) {
   const handleClose = useCallback(() => {
     onVisibleChange?.call(null, false);
   }, [onVisibleChange]);
+  const resetConfig = useCallback(
+    unwrappedAction(() => {
+      const {
+        canvasWidth,
+        canvasHeight,
+        marginTop,
+        marginHorizontal,
+      } = getDefaultGlobalData();
+      Object.assign(store, {
+        canvasWidth,
+        canvasHeight,
+        marginTop,
+        marginHorizontal,
+      });
+    })
+  );
 
   return (
     <Modal
       visible={visible}
       title="配置"
       onCancel={handleClose}
-      footer={
-        <Button key="ok" type="primary" onClick={handleClose}>
+      footer={[
+        <Button key="reset" onClick={resetConfig}>
+          重置为默认
+        </Button>,
+        <Button key="close" type="primary" onClick={handleClose}>
           关闭
-        </Button>
-      }
+        </Button>,
+      ]}
     >
       <Form labelAlign="right" labelCol={{ span: 4 }}>
         <Form.Item label="画布大小">
@@ -63,6 +83,7 @@ function ConfigModal({ visible, onVisibleChange }) {
             />
           </Input.Group>
         </Form.Item>
+        <ImmediateNumberConfigItem label="顶部边距" propertyName="marginTop" />
         <ImmediateNumberConfigItem
           label="左右边距"
           propertyName="marginHorizontal"

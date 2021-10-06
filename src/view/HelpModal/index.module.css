@@ -1,0 +1,19 @@
+.list {
+padding: 0;
+list-style: none;
+}
+.listItem {
+  display: inline-block;
+  margin-top: 8px;
+  margin-right: 16px;
+  min-width: 260px;
+}
+.kbd {
+  display: inline-block;
+  margin-right: 8px;
+  border-radius: 4px;
+  background-color: lightgray;
+  padding: 4px;
+  width: 120px;
+  text-align: center;
+}
