@@ -6,6 +6,7 @@ import { getDefaultGlobalData } from "../../util/editor";
 import { unwrappedAction } from "../../store/history";
 
 const ImmediateNumberConfigInput = observer(({ propertyName, ...props }) => {
+  // ENHANCE: 防抖处理
   const handleChange = unwrappedAction((ev) => {
     const v = Number(ev.target.value) | 0;
     store[propertyName] = v;

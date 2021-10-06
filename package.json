@@ -2,6 +2,17 @@
   "name": "numerical-notation-editor",
   "version": "0.1.0",
   "private": true,
+  "homepage": "./",
+  "author": {
+    "name": "Haven Mattuy",
+    "email": "mattuylee@outlook.com"
+  },
+  "description": "基于svg技术的简谱编辑器",
+  "keywords": [
+    "简谱",
+    "编辑器",
+    "转调"
+  ],
   "dependencies": {
     "@ant-design/icons": "^4.7.0",
     "@testing-library/jest-dom": "^5.14.1",
