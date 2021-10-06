@@ -2,9 +2,11 @@
 一个Web版简谱编辑器，支持一键转调和图片导出。
 
 ## 在线Demo
-[Github Page](https://github.io/mattuylee/numerical-notation-editor/)
-[编辑器](https://github.io/mattuylee/numerical-notation-editor/editor/)
-[示例曲子：烟雨](https://github.io/mattuylee/numerical-notation-editor/editor/?loadExample)
+[Github Page](https://mattuylee.github.io/numerical-notation-editor/)
+
+[编辑器](https://mattuylee.github.io/numerical-notation-editor/editor/)
+
+[示例曲子：烟雨](https://mattuylee.github.io/numerical-notation-editor/editor/?loadExample)
 
 ## 功能
 * 所见即所得，支持常见简谱元素
