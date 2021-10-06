@@ -87,13 +87,13 @@ function Paragraph({ paragraph, offsetY, alignJustify }) {
               // 当前音符可能和下一个音符的增减时线连续，本次循环不绘制
               toIndex = i;
             }
-            if (i === notations.length - 1) {
-              // 已是最后一个音符，直接绘制增减时线
-              lines.push(renderUnderLine(baseOffsetY, fromIndex, toIndex));
-              fromIndex = toIndex = -1;
-            }
           } else {
             fromIndex = toIndex = i;
+          }
+          if (i === notations.length - 1) {
+            // 已是最后一个音符，直接绘制增减时线
+            lines.push(renderUnderLine(baseOffsetY, fromIndex, toIndex));
+            fromIndex = toIndex = -1;
           }
           --helpMap[i];
         } else {
