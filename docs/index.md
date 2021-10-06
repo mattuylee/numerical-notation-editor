@@ -1,37 +1,10 @@
-## 简谱编辑器
+## 基于Web技术构建的简谱编辑器
 
-You can use the [editor on GitHub](https://github.com/mattuylee/numerical-notation-editor/edit/main/docs/index.md) to maintain and preview the content for your website in Markdown files.
+### 功能
+* 所见即所得，支持常见简谱元素
+* 全键盘输入音符，高效快速
+* 一键转调，避免出错
+* 高清图片导出
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
-
-### Markdown
-
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/mattuylee/numerical-notation-editor/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+### 示例截图
+![](./screenshot.png)

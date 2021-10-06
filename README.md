@@ -4,8 +4,6 @@
 ## 在线Demo
 [Github Page](https://mattuylee.github.io/numerical-notation-editor/)
 
-[编辑器](https://mattuylee.github.io/numerical-notation-editor/editor/)
-
 [示例曲子：烟雨](https://mattuylee.github.io/numerical-notation-editor/editor/?loadExample)
 
 ## 功能
