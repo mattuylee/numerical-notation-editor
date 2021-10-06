@@ -27,6 +27,9 @@ const separators = ["│", "‖"];
 function isNote(notationOrNote) {
   return notes.includes(notationOrNote?.note || notationOrNote);
 }
+function isPauseNote(notationOrNote) {
+  return notations.zero === (notationOrNote?.note || notationOrNote);
+}
 function isSeparator(notationOrNote) {
   return separators.includes(notationOrNote?.note || notationOrNote);
 }
@@ -56,4 +59,11 @@ function cloneNotation(notation) {
   return n;
 }
 
-export { notations, isNote, isSeparator, createNotation, cloneNotation };
+export {
+  notations,
+  isNote,
+  isPauseNote,
+  isSeparator,
+  createNotation,
+  cloneNotation,
+};

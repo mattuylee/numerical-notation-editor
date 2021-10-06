@@ -21,6 +21,7 @@ import {
   createParagraph,
   createParagraphWithNotations,
 } from "../util/paragraph";
+import { convertTone, convertToneTo } from "../util/tone-convert";
 import { exportFile, loadFile, saveFile } from "../util/file";
 import { findParagraphAndNotation, resetGlobalData } from "../util/editor";
 import {
@@ -74,9 +75,28 @@ const handleEditMenu = wrappedAction(({ key }) => {
       break;
   }
 });
-const handleConvertMenu = wrappedAction(() => {
-  console.log(111);
-});
+const handleConvertMenu = ({ key }) => {
+  switch (true) {
+    case key.startsWith("convertTo"):
+      const destTone = key.split("-", 2)[1];
+      convertToneTo(destTone);
+      break;
+    case key === "convert-up":
+      convertTone(2);
+      break;
+    case key === "convert-down":
+      convertTone(-2);
+      break;
+    case key === "convert-up8":
+      convertTone(12);
+      break;
+    case key === "convert-down8":
+      convertTone(-12);
+      break;
+    default:
+      break;
+  }
+};
 
 // 画布上的点击事件
 const handleClick = wrappedAction((ev) => {
@@ -94,6 +114,9 @@ const handleKeyPress = wrappedAction((ev) => {
 
   if (state.selectedNotationKey) {
     // 仅选中符号时作用
+    if (state.helpDialogVisible || state.configDialogVisible) {
+      return;
+    }
     const {
       paragraph,
       notation,
@@ -404,33 +427,27 @@ const editMenu = (
 
 const convertMenu = (
   <Menu key="tone" onClick={handleConvertMenu}>
-    <SubMenu key="convert-to" title="转到...">
-      <Menu.Item key="convert-to-C">1 = C</Menu.Item>
-      <Menu.Item key="convert-to-D">1 = D</Menu.Item>
-      <Menu.Item key="convert-to-E">1 = E</Menu.Item>
-      <Menu.Item key="convert-to-F">1 = F</Menu.Item>
-      <Menu.Item key="convert-to-G">1 = G</Menu.Item>
-      <Menu.Item key="convert-to-A">1 = A</Menu.Item>
-      <Menu.Item key="convert-to-B">1 = B</Menu.Item>
-      <Menu.Item key="convert-to-bC">
-        1 = <sup>♭</sup>C
-      </Menu.Item>
-      <Menu.Item key="convert-to-bD">
+    <SubMenu key="convertTo" title="转到...">
+      <Menu.Item key="convertTo-C">1 = C</Menu.Item>
+      <Menu.Item key="convertTo-D">1 = D</Menu.Item>
+      <Menu.Item key="convertTo-E">1 = E</Menu.Item>
+      <Menu.Item key="convertTo-F">1 = F</Menu.Item>
+      <Menu.Item key="convertTo-G">1 = G</Menu.Item>
+      <Menu.Item key="convertTo-A">1 = A</Menu.Item>
+      <Menu.Item key="convertTo-B">1 = B</Menu.Item>
+      <Menu.Item key="convertTo-♭D">
         1 = <sup>♭</sup>D
       </Menu.Item>
-      <Menu.Item key="convert-to-bE">
+      <Menu.Item key="convertTo-♭E">
         1 = <sup>♭</sup>E
       </Menu.Item>
-      <Menu.Item key="convert-to-bF">
-        1 = <sup>♭</sup>F
-      </Menu.Item>
-      <Menu.Item key="convert-to-bG">
+      <Menu.Item key="convertTo-♭G">
         1 = <sup>♭</sup>G
       </Menu.Item>
-      <Menu.Item key="convert-to-bA">
+      <Menu.Item key="convertTo-♭A">
         1 = <sup>♭</sup>A
       </Menu.Item>
-      <Menu.Item key="convert-to-bB">
+      <Menu.Item key="convertTo-♭B">
         1 = <sup>♭</sup>B
       </Menu.Item>
     </SubMenu>
