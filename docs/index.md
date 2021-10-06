@@ -1,4 +1,4 @@
-## Welcome to GitHub Pages
+## 简谱编辑器
 
 You can use the [editor on GitHub](https://github.com/mattuylee/numerical-notation-editor/edit/main/docs/index.md) to maintain and preview the content for your website in Markdown files.
 
