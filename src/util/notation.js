@@ -1,3 +1,5 @@
+import { toJS } from "mobx";
+
 const notations = {
   zero: "0",
   do: "1",
@@ -31,6 +33,7 @@ function isSeparator(notationOrNote) {
 // 创建符号
 function createNotation(initial) {
   const n = {
+    type: "notation",
     key: `n_${String(Math.random())}`,
     note: "0",
     octave: 0,
@@ -46,5 +49,11 @@ function createNotation(initial) {
   }
   return n;
 }
+function cloneNotation(notation) {
+  const origin = JSON.parse(JSON.stringify(toJS(notation)));
+  delete origin.key;
+  const n = createNotation(origin);
+  return n;
+}
 
-export { notations, isNote, isSeparator, createNotation };
+export { notations, isNote, isSeparator, createNotation, cloneNotation };

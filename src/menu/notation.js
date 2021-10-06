@@ -58,7 +58,7 @@ const getNotationContextMenu = (notation, paragraph) => {
         </Menu.Item>
       )}
       <Menu.Item key="delete" icon={<DeleteOutlined />}>
-        删除
+        删除符号
       </Menu.Item>
     </Menu>
   );

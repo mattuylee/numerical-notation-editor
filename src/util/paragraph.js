@@ -1,8 +1,10 @@
-import { createNotation, notations as N } from "./notation";
+import { toJS } from "mobx";
+import { cloneNotation, createNotation, notations as N } from "./notation";
 
 // 新建段落
 function createParagraph(initial) {
   const p = {
+    type: "paragraph",
     key: `p_${String(Math.random())}`,
     // 符号列表
     notations: [],
@@ -25,5 +27,11 @@ function createParagraphWithNotations() {
     ],
   });
 }
+function cloneParagraph(paragraph) {
+  const origin = JSON.parse(JSON.stringify(toJS(paragraph)));
+  delete origin.key;
+  origin.notations = paragraph.notations.map((n) => cloneNotation(n));
+  return createParagraph(origin);
+}
 
-export { createParagraph, createParagraphWithNotations };
+export { createParagraph, createParagraphWithNotations, cloneParagraph };

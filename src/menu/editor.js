@@ -10,13 +10,19 @@ import {
 import { Menu } from "antd";
 import state from "../store/state";
 import store from "../store/global";
-import { createNotation, isNote, notations as N } from "../util/notation";
 import {
+  cloneNotation,
+  createNotation,
+  isNote,
+  notations as N,
+} from "../util/notation";
+import {
+  cloneParagraph,
   createParagraph,
   createParagraphWithNotations,
 } from "../util/paragraph";
 import { exportFile, loadFile, saveFile } from "../util/file";
-import { findParagraphAndNotation } from "../util/editor";
+import { findParagraphAndNotation, resetGlobalData } from "../util/editor";
 import {
   go,
   runInWrappedAction,
@@ -27,15 +33,18 @@ import {
 const { SubMenu } = Menu;
 
 const handleOpenFile = unwrappedAction((ev) => {
-  // TODO: working
   const file = ev.target.files[0];
   loadFile(file);
 });
-const handleSaveFile = unwrappedAction(() => {
+const handleSaveFile = () => {
   saveFile();
-});
-const handleExportFile = () => {
+};
+const handleExportFile = unwrappedAction(() => {
+  state.selectedNotationKey = null;
   exportFile();
+});
+const handleCreate = () => {
+  resetGlobalData();
 };
 const handleEditMenu = wrappedAction(({ key }) => {
   switch (key) {
@@ -149,7 +158,6 @@ const handleKeyPress = wrappedAction((ev) => {
         }
         break;
       }
-      case inputKey === "l" && !ctrl && !shift:
       case inputKey === "enter" && !ctrl && !shift: {
         if (paragraph.notations[notationIndex + 1]) {
           state.selectedNotationKey =
@@ -161,11 +169,28 @@ const handleKeyPress = wrappedAction((ev) => {
         }
         break;
       }
-      case inputKey === "h" && !ctrl && !shift:
+      case inputKey === "l" && !ctrl && !shift: {
+        const nextNotation =
+          paragraph.notations[notationIndex + 1] ||
+          store.paragraphs[paragraphIndex + 1].notations?.at(0);
+        if (nextNotation) {
+          state.selectedNotationKey = nextNotation.key;
+        }
+        break;
+      }
       case inputKey === "enter" && !ctrl && shift: {
         if (paragraph.notations[notationIndex - 1]) {
           state.selectedNotationKey =
             paragraph.notations[notationIndex - 1].key;
+        }
+        break;
+      }
+      case inputKey === "h" && !ctrl && !shift: {
+        const prevNotation =
+          paragraph.notations[notationIndex - 1] ||
+          store.paragraphs[paragraphIndex - 1].notations?.at(-1);
+        if (prevNotation) {
+          state.selectedNotationKey = prevNotation.key;
         }
         break;
       }
@@ -206,11 +231,23 @@ const handleKeyPress = wrappedAction((ev) => {
         }
         break;
       }
+      case inputKey === "backspace" && !ctrl && !shift:
       case inputKey === "delete" && !ctrl && !shift: {
         paragraph.notations.splice(notationIndex, 1);
         const currNotation =
           paragraph.notations[notationIndex] ||
           paragraph.notations[notationIndex - 1];
+        state.selectedNotationKey = currNotation?.key;
+        break;
+      }
+      case inputKey === "backspace" && !ctrl && shift:
+      case inputKey === "delete" && !ctrl && shift: {
+        store.paragraphs.splice(paragraphIndex, 1);
+        const currParagraph =
+          store.paragraphs[paragraphIndex] || store.paragraphs.at(-1);
+        const currNotation =
+          currParagraph?.notations?.at(notationIndex) ||
+          currParagraph?.notations?.at(-1);
         state.selectedNotationKey = currNotation?.key;
         break;
       }
@@ -224,6 +261,40 @@ const handleKeyPress = wrappedAction((ev) => {
         paragraph.alignJustify = !paragraph.alignJustify;
         break;
       }
+      case inputKey === "c" && ctrl && !shift: {
+        ev.preventDefault();
+        state.clipboardContent = notation;
+        break;
+      }
+      case inputKey === "c" && ctrl && shift: {
+        ev.preventDefault();
+        state.clipboardContent = paragraph;
+        break;
+      }
+      case inputKey === "v" && ctrl && !shift: {
+        ev.preventDefault();
+        if (state.clipboardContent) {
+          switch (state.clipboardContent.type) {
+            case "notation":
+              paragraph.notations.splice(
+                notationIndex + 1,
+                0,
+                cloneNotation(state.clipboardContent)
+              );
+              break;
+            case "paragraph":
+              store.paragraphs.splice(
+                paragraphIndex + 1,
+                0,
+                cloneParagraph(state.clipboardContent)
+              );
+              break;
+            default:
+              state.clipboardContent = null;
+          }
+        }
+        break;
+      }
       default:
         break;
     }
@@ -231,9 +302,12 @@ const handleKeyPress = wrappedAction((ev) => {
     // 仅未选中符号时
     switch (true) {
       case ["h", "j", "k", "l"].includes(inputKey): {
-        state.selectedNotationKey =
-          state.lastSelectedNotationKey ||
-          store.paragraphs?.at(0)?.notations?.at(0).key;
+        const { notation: n } = findParagraphAndNotation(
+          state.lastSelectedNotationKey
+        );
+        state.selectedNotationKey = (
+          n || store.paragraphs?.at(0)?.notations?.at(0)
+        )?.key;
         break;
       }
       default:
@@ -279,7 +353,7 @@ const handleKeyPress = wrappedAction((ev) => {
 
 const fileMenu = (
   <Menu>
-    <Menu.Item key="create" icon={<PlusOutlined />}>
+    <Menu.Item key="create" icon={<PlusOutlined />} onClick={handleCreate}>
       新建
     </Menu.Item>
     <Menu.Item key="open" icon={<FolderOpenOutlined />}>

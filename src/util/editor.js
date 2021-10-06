@@ -1,4 +1,7 @@
+import { remove, transaction } from "mobx";
+import state from "../store/state";
 import store from "../store/global";
+import { clearHistory, unwrappedAction } from "../store/history";
 import { createParagraphWithNotations } from "../util/paragraph";
 import { VERSION } from "./version";
 
@@ -49,8 +52,23 @@ function findParagraphAndNotation(key) {
   return res;
 }
 
+const resetGlobalData = unwrappedAction((globalData) => {
+  if (!globalData) {
+    globalData = getDefaultGlobalDataWidthNotations();
+  }
+  state.lastSelectedNotationKey = state.selectedNotationKey = state.tieSourceKey = null;
+  clearHistory();
+  transaction(() => {
+    for (const key of Object.keys(store)) {
+      remove(store, key);
+    }
+    Object.assign(store, globalData);
+  });
+});
+
 export {
   getDefaultGlobalData,
   findParagraphAndNotation,
   getDefaultGlobalDataWidthNotations,
+  resetGlobalData,
 };

@@ -36,6 +36,7 @@ function HelpModal({ visible, onVisibleChange }) {
         <KeyboardDescItem kbd="？" desc="显示此帮助" />
         <KeyboardDescItem kbd="Ctrl+Z" desc="撤销" />
         <KeyboardDescItem kbd="Ctrl+Shift+Z" desc="重做" />
+        <KeyboardDescItem kbd="Ctrl+O" desc="打开文件" />
         <KeyboardDescItem kbd="h j k l" desc="移动焦点" />
       </ul>
       <h3>仅选中符号时</h3>
@@ -55,8 +56,12 @@ function HelpModal({ visible, onVisibleChange }) {
         <KeyboardDescItem kbd="Shift+Enter" desc="移动到上一个音符" />
         <KeyboardDescItem kbd="Ctrl+Enter" desc="在当前位置后插入音符" />
         <KeyboardDescItem kbd="Delete" desc="删除当前音符" />
+        <KeyboardDescItem kbd="Shift+Delete" desc="删除当前段落" />
         <KeyboardDescItem kbd="=" desc="段落是否两端对齐" />
         <KeyboardDescItem kbd="h j k l" desc="Vi风格移动焦点" />
+        <KeyboardDescItem kbd="Ctrl+C" desc="复制当前音符" />
+        <KeyboardDescItem kbd="Ctrl+Shift+C" desc="复制当前段落" />
+        <KeyboardDescItem kbd="Ctrl+V" desc="粘贴" />
       </ul>
       <h2>提示</h2>
       <ul className={Styles.list}>

@@ -1,11 +1,9 @@
 import { message } from "antd";
-import { remove, transaction } from "mobx";
 import { toJS } from "mobx";
-import globalState from "../store/state";
 import store from "../store/global";
-import { clearHistory } from "../store/history";
 import domtoimage from "./dom-to-image";
 import { VERSION } from "./version";
+import { resetGlobalData } from "./editor";
 
 function read(file) {
   return new Promise((resolve, reject) => {
@@ -23,14 +21,7 @@ async function loadFile(file) {
     message.error("不支持的文件格式，请使用最新版本");
     return;
   }
-  globalState.lastSelectedNotationKey = globalState.selectedNotationKey = null;
-  clearHistory();
-  transaction(() => {
-    for (const key of Object.keys(store)) {
-      remove(store, key);
-    }
-    Object.assign(store, data);
-  });
+  resetGlobalData(data);
 }
 
 function saveFile() {
@@ -45,12 +36,14 @@ function saveFile() {
 }
 
 function exportFile() {
-  domtoimage.toPng(document.querySelector("#temp_svg")).then((dataUrl) => {
-    const downloadLink = document.createElement("a");
-    downloadLink.download = (store.title || "未标题") + ".png";
-    downloadLink.href = dataUrl;
-    downloadLink.click();
-  });
+  domtoimage
+    .toPng(document.querySelector("#temp_svg"), { bgcolor: "white" })
+    .then((dataUrl) => {
+      const downloadLink = document.createElement("a");
+      downloadLink.download = (store.title || "未标题") + ".png";
+      downloadLink.href = dataUrl;
+      downloadLink.click();
+    });
 }
 
 export { saveFile, loadFile, exportFile };
