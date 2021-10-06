@@ -52,6 +52,11 @@ function go(span) {
   Object.assign(globalStore, storeHistory[newCursor]);
 }
 
+function clearHistory() {
+  storeHistory.length = 0;
+  cursor = -1;
+}
+
 // 包装mobx的action以实现历史记录
 function executeAction(actionFunc, ...args) {
   actionFunc.apply(this, args);
@@ -88,12 +93,14 @@ function runInWrappedAction(func) {
     executeAction.call(this, func);
   });
 }
+
 // 不需要记录历史记录的时候直接使用原action
 const unwrappedAction = action;
 const runInUnwrappedAction = runInAction;
 
 export {
   go,
+  clearHistory,
   wrappedAction,
   runInWrappedAction,
   unwrappedAction,

@@ -1,3 +1,4 @@
+import { Button, Menu, Upload } from "antd";
 import {
   FolderOpenOutlined,
   HighlightOutlined,
@@ -7,16 +8,32 @@ import {
   SaveOutlined,
   UndoOutlined,
 } from "@ant-design/icons";
-import { Menu } from "antd";
 import state from "../store/state";
 import store from "../store/global";
 import { createNotation, isNote, notations as N } from "../util/notation";
 import { createParagraph } from "../util/paragraph";
+import { exportFile, loadFile, saveFile } from "../util/file";
 import { findParagraphAndNotation } from "../util/editor";
-import { go, runInWrappedAction, wrappedAction } from "../store/history";
+import {
+  go,
+  runInWrappedAction,
+  unwrappedAction,
+  wrappedAction,
+} from "../store/history";
 
 const { SubMenu } = Menu;
 
+const handleOpenFile = unwrappedAction((ev) => {
+  // TODO: working
+  const file = ev.target.files[0];
+  loadFile(file);
+});
+const handleSaveFile = unwrappedAction(() => {
+  saveFile();
+});
+const handleExportFile = () => {
+  exportFile();
+};
 const handleEditMenu = wrappedAction(({ key }) => {
   switch (key) {
     case "undo":
@@ -221,6 +238,20 @@ const handleKeyPress = wrappedAction((ev) => {
     case inputKey === "z" && ctrl && shift:
       go(1);
       break;
+    case inputKey === "s" && ctrl && !shift: {
+      ev.preventDefault();
+      saveFile();
+      break;
+    }
+    case inputKey === "o" && ctrl && !shift: {
+      ev.preventDefault();
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = ".json";
+      input.onchange = handleOpenFile;
+      input.click();
+      break;
+    }
     case inputKey === "?" && !ctrl: {
       if (state.helpDialogVisible) {
         state.helpDialogVisible = false;
@@ -240,9 +271,27 @@ const fileMenu = (
     </Menu.Item>
     <Menu.Item key="open" icon={<FolderOpenOutlined />}>
       打开
+      <input
+        onChange={handleOpenFile}
+        accept=".json"
+        type="file"
+        title=""
+        style={{
+          opacity: 0,
+          cursor: "pointer",
+          width: "100%",
+          left: 0,
+          top: 0,
+          height: "100%",
+          position: "absolute",
+        }}
+      />
     </Menu.Item>
-    <Menu.Item key="save" icon={<SaveOutlined />}>
+    <Menu.Item key="save" icon={<SaveOutlined />} onClick={handleSaveFile}>
       保存
+    </Menu.Item>
+    <Menu.Item key="export" icon={<SaveOutlined />} onClick={handleExportFile}>
+      导出为图片
     </Menu.Item>
   </Menu>
 );

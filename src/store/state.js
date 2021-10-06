@@ -14,6 +14,12 @@ let globalState = observable({
   helpDialogVisible: false,
   // 配置项弹窗是否可见
   configDialogVisible: false,
+  // 持久化的文件
+  file: null,
+  // ref
+  refs: {
+    svg: null,
+  },
 });
 
 export default globalState;

@@ -53,6 +53,7 @@ function LeftInfoBlock() {
         initialValue={store.tone}
         options={tones}
         onChange={handleChangeTone}
+        popoverProps={{ trigger: "click" }}
       >
         <Row
           type="tone"
