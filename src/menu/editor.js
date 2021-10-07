@@ -15,6 +15,7 @@ import {
   createNotation,
   isNote,
   notations as N,
+  placeTie,
 } from "../util/notation";
 import {
   cloneParagraph,
@@ -177,6 +178,32 @@ const handleKeyPress = wrappedAction((ev) => {
         } else {
           notation.prefixSups.shift();
         }
+        break;
+      }
+      case inputKey === "a" && !ctrl && !shift: {
+        if (!state.tieSourceKey) {
+          state.tieSourceKey = notation.key;
+        } else if (state.tieSourceKey === notation.key) {
+          state.tieSourceKey = null;
+        } else {
+          placeTie(notation);
+        }
+        break;
+      }
+      case inputKey === "a" && !ctrl && shift: {
+        if (notation.tieTo) {
+          const { notation: tieDesc } = findParagraphAndNotation(
+            notation.tieTo
+          );
+          if (tieDesc) {
+            tieDesc.tieTo = null;
+          }
+          notation.tieTo = null;
+          break;
+        }
+      }
+      case inputKey === "!" && !ctrl: {
+        notation.breakUnderline = !notation.breakUnderline;
         break;
       }
       case inputKey === "~" && !ctrl: {
