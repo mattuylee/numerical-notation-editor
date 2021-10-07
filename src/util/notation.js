@@ -11,6 +11,8 @@ const notations = {
   si: "7",
   extend: "─",
   separator: "│",
+  crackerOpen: "（",
+  crackerClose: ")"
 };
 const notes = [
   notations.zero,

@@ -130,6 +130,12 @@ const handleKeyPress = wrappedAction((ev) => {
       case isNote(inputKey) && !ctrl && !shift:
         notation.note = inputKey;
         break;
+      case inputKey === "(" && !ctrl:
+        notation.note = N.crackerOpen;
+        break;
+      case inputKey === ")" && !ctrl:
+        notation.note = N.crackerClose;
+        break;
       case inputKey === "-" && !ctrl && !shift:
         notation.note = N.extend;
         break;
