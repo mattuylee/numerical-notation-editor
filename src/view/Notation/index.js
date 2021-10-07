@@ -1,12 +1,10 @@
-import { message } from "antd";
 import { observer } from "mobx-react-lite";
 import EditableContent from "../../component/EditableContent";
 import state from "../../store/state";
 import store from "../../store/global";
 import P, { calcSubTextWidth } from "../../util/placement";
-import { findParagraphAndNotation } from "../../util/editor";
 import { getNotationContextMenu } from "../../menu/notation";
-import { isNote, notations } from "../../util/notation";
+import { notations, placeTie } from "../../util/notation";
 import { wrappedAction } from "../../store/history";
 import Row from "../Row";
 import Text from "../Text";
@@ -24,31 +22,7 @@ function Notation({ offsetX, notation, paragraph }) {
   const handleClick = wrappedAction(() => {
     state.selectedNotationKey = notation.key;
     state.shouldNotationBlurAfterClick = false;
-    if (state.tieSourceKey) {
-      // 处理连音线
-      if (state.tieSourceKey === notation.key) {
-        state.tieSourceKey = null;
-        // NOTICE: 如果要添加其他逻辑注意这里的return
-        return;
-      }
-      const {
-        notation: sourceNotation,
-        paragraph: sourceParagraph,
-      } = findParagraphAndNotation(state.tieSourceKey);
-      if (!sourceNotation) {
-        state.tieSourceKey = null;
-        return;
-      }
-      if (!sourceParagraph.notations.includes(notation)) {
-        message.warn("只允许相同段落的音符相连！");
-      } else if (!isNote(notation)) {
-        message.warn("只允许在音符上添加连音线！");
-      } else {
-        sourceNotation.tieTo = notation.key;
-        notation.tieTo = sourceNotation.key;
-      }
-      state.tieSourceKey = null;
-    }
+    placeTie(notation);
   });
 
   const underlineOffset = P.underlineStepOffsetY * (notation.underline | 0);

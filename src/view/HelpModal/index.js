@@ -40,9 +40,14 @@ function HelpModal({ visible, onVisibleChange }) {
         <KeyboardDescItem kbd="h j k l" desc="移动焦点" />
       </ul>
       <h3>仅选中符号时</h3>
-      <h4>输入</h4>
+      <h4>输入音符</h4>
+      直接按键盘上相应的键即可输入到当前符号。支持的音符符号有：
+      <p>
+        <kbd className={Styles.kbd}>0~7</kbd>
+        <kbd className={Styles.kbd}>( )</kbd>
+      </p>
+      <h4>输入辅助元素</h4>
       <ul className={Styles.list}>
-        <KeyboardDescItem kbd="0~7, -" desc="输入音符" />
         <KeyboardDescItem kbd="|" desc="输入小节线" />
         <KeyboardDescItem kbd="." desc="输入附点" />
         <KeyboardDescItem kbd="~" desc="颤音符号" />
