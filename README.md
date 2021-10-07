@@ -36,7 +36,7 @@ npm run start
 # 编译
 npm run build
 ```
-要部署Github Page，将编译的`build`目录放到`docs`下并重命名为`editor`。
+要部署Github Page，执行`npm run publish`，将会编译并复制到`docs/`。
 
 ## Q&A
 [Wiki](https://github.com/mattuylee/numerical-notation-editor/wiki)
